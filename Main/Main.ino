@@ -3,6 +3,10 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *LeftMotor = AFMS.getMotor(1);
 Adafruit_DCMotor *RightMotor = AFMS.getMotor(2);
 
+int DIGITAL_OUT_L=2;
+int DIGITAL_OUT_R=3;
+int stepsL = 0;
+int stepsR = 0;
 int var = 0;
 
 const byte TRIGGER_PIN = 2; 
@@ -10,9 +14,28 @@ const byte ECHO_PIN = 3;
 const unsigned long MEASURE_TIMEOUT = 25000UL;
 const float SOUND_SPEED = 340.0 / 1000;
 
+void checkStepStateL(){
+  if (digitalRead(DIGITAL_OUT_L) == HIGH){
+    stepsL +=1;
+  }
+}
+void checkStepStateR(){
+  if (digitalRead(DIGITAL_OUT_R) == HIGH){
+    stepsR +=1;
+  }
+}
 
 void setup() {
+  // Set DIGITAL_OUT as an INPUT
+  pinMode(DIGITAL_OUT_L, INPUT);
+  pinMode(DIGITAL_OUT_R, INPUT);
+  
   Serial.begin(9600);
+
+  // attach Interrupt to Interrupt Service Routine
+  attachInterrupt(digitalPinToInterrupt(DIGITAL_OUT_L), checkStepStateL, RISING);
+  attachInterrupt(digitalPinToInterrupt(DIGITAL_OUT_R), checkStepStateR, RISING);
+  
   if (!AFMS.begin()) {         
     Serial.println("Could not find Motor Shield. Check wiring.");
     while (1);
