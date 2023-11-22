@@ -1,7 +1,7 @@
 #include <Adafruit_MotorShield.h>
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *LeftMotor = AFMS.getMotor(1);
-Adafruit_DCMotor *RightMotor = AFMS.getMotor(2);
+Adafruit_DCMotor *RightMotor = AFMS.getMotor(4);
 
 float distance_mm = 0.0;
 const byte TRIGGER_PIN = 7; 
@@ -34,7 +34,7 @@ void setup() {
 
 void loop() {
   measureDistance();
-  if (distance_mm < 10.0){
+  if (distance_mm < 50.0){
     MoveStop();
   }
   else {
