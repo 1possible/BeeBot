@@ -3,6 +3,18 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *LeftMotor = AFMS.getMotor(1);
 Adafruit_DCMotor *RightMotor = AFMS.getMotor(2);
 
+#define IRleft_PIN 4  
+#define IRright_PIN 5
+
+int detectionLeft = HIGH;    // no obstacle
+int detectionRigth = HIGH; 
+
+int vL = 75; //Low speed left
+int VL = 125; //Hight speed left
+int vR = 75; //Low speed right
+int VR = 125; //Hight speed right
+int v = 100; //speed forward
+
 float distance_mm = 0.0;
 const byte TRIGGER_PIN = 7; 
 const byte ECHO_PIN = 6;    
@@ -20,16 +32,18 @@ void setup() {
   }
   Serial.println("Motor Shield found.");
   
-  LeftMotor->setSpeed(150);
-  LeftMotor->run(FORWARD);
+  LeftMotor->setSpeed(0);
   LeftMotor->run(RELEASE);
-  RightMotor->setSpeed(150);
-  RightMotor->run(FORWARD);
+  RightMotor->setSpeed(0);
   RightMotor->run(RELEASE);
 
   pinMode(TRIGGER_PIN, OUTPUT);
   digitalWrite(TRIGGER_PIN, LOW);
   pinMode(ECHO_PIN, INPUT);
+
+  //pin IRsensor
+  pinMode(IRleft_PIN, INPUT); 
+  pinMode(IRright_PIN, INPUT); 
 }
 
 void loop() {
@@ -38,11 +52,11 @@ void loop() {
     MoveStop();
   }
   else {
-    MoveForward();
+    followingLine();
   }
 }
 
-void measureDistance ()
+int measureDistance ()
 {
   digitalWrite(TRIGGER_PIN, HIGH);
   delayMicroseconds(10);
@@ -75,4 +89,33 @@ void turnLeft() {
 void turnRight(){
   LeftMotor->run(FORWARD);
   RightMotor->run(BACKWARD);
+}
+bool followingLine(){
+  bool endLine = false;
+  detectionLeft = digitalRead(IRleft_PIN);
+  detectionRigth = digitalRead(IRright_PIN);
+  if(detectionLeft == LOW and detectionRigth == HIGH){
+    LeftMotor->setSpeed(VL);
+    LeftMotor->run(FORWARD);
+    RightMotor->setSpeed(vR);
+    RightMotor->run(FORWARD);
+  }else if(detectionLeft == HIGH and detectionRigth == LOW){
+    LeftMotor->setSpeed(vL);
+    LeftMotor->run(FORWARD);
+    RightMotor->setSpeed(VR);
+    RightMotor->run(FORWARD);
+  }else if(detectionLeft == LOW and detectionRigth == LOW){
+    LeftMotor->setSpeed(v);
+    LeftMotor->run(FORWARD);
+    RightMotor->setSpeed(v);
+    RightMotor->run(FORWARD);
+  } 
+  else{
+    LeftMotor->setSpeed(0);
+    LeftMotor->run(RELEASE);
+    RightMotor->setSpeed(0);
+    RightMotor->run(RELEASE);
+    endLine = true;
+  }
+  return endLine;
 }
