@@ -1,7 +1,7 @@
 #include <Adafruit_MotorShield.h>
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
-Adafruit_DCMotor *LeftMotor = AFMS.getMotor(1);
-Adafruit_DCMotor *RightMotor = AFMS.getMotor(4);
+Adafruit_DCMotor *LeftMotor = AFMS.getMotor(3);
+Adafruit_DCMotor *RightMotor = AFMS.getMotor(2);
 
 #define IRleft_PIN 4  
 #define IRright_PIN 5
@@ -48,12 +48,14 @@ void setup() {
 
 void loop() {
   measureDistance();
-  if (distance_mm < 50.0){
+  if (distance_mm != 0 && distance_mm < 50.0){
     MoveStop();
   }
   else {
     followingLine();
   }
+
+  
 }
 
 int measureDistance ()
