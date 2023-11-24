@@ -9,11 +9,13 @@ Adafruit_DCMotor *RightMotor = AFMS.getMotor(2);
 int detectionLeft = HIGH;    // no obstacle
 int detectionRigth = HIGH; 
 
-int vL = 75; //Low speed left
-int VL = 125; //Hight speed left
-int vR = 75; //Low speed right
-int VR = 125; //Hight speed right
-int v = 100; //speed forward
+int vL = 55; //Low speed left //60
+int VL = 115; //Hight speed left //125
+int vR = 75; //Low speed right //75
+int VR = 200; //Hight speed right //140
+int v = 90; //speed forward //90
+
+unsigned long timeLine;
 
 float distance_mm = 0.0;
 const byte TRIGGER_PIN = 7; 
@@ -48,10 +50,10 @@ void setup() {
 
 void loop() {
   measureDistance();
-  if (distance_mm != 0 && distance_mm < 50.0){
+  if (distance_mm != 0 && distance_mm < 100.0){
     MoveStop();
   }
-  else {
+  else{
     followingLine();
   }
 
@@ -101,23 +103,32 @@ bool followingLine(){
     LeftMotor->run(FORWARD);
     RightMotor->setSpeed(vR);
     RightMotor->run(FORWARD);
+    timeLine = millis();
   }else if(detectionLeft == HIGH and detectionRigth == LOW){
-    LeftMotor->setSpeed(vL);
+    LeftMotor->setSpeed(vL-10);
     LeftMotor->run(FORWARD);
     RightMotor->setSpeed(VR);
     RightMotor->run(FORWARD);
+    timeLine = millis();;
   }else if(detectionLeft == LOW and detectionRigth == LOW){
-    LeftMotor->setSpeed(v);
+    LeftMotor->setSpeed(v-10);
     LeftMotor->run(FORWARD);
     RightMotor->setSpeed(v);
     RightMotor->run(FORWARD);
-  } 
-  else{
+    timeLine =millis();
+  }else if(detectionLeft == HIGH and detectionRigth == HIGH and (millis()-timeLine) >250){
     LeftMotor->setSpeed(0);
     LeftMotor->run(RELEASE);
     RightMotor->setSpeed(0);
     RightMotor->run(RELEASE);
     endLine = true;
+  }
+  else{
+    LeftMotor->setSpeed(v-50);
+    LeftMotor->run(FORWARD);
+    RightMotor->setSpeed(v);
+    RightMotor->run(FORWARD);
+    
   }
   return endLine;
 }
