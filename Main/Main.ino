@@ -3,17 +3,20 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *LeftMotor = AFMS.getMotor(3);
 Adafruit_DCMotor *RightMotor = AFMS.getMotor(2);
 
+#define switchGroup 8
+
 #define IRleft_PIN 4  
 #define IRright_PIN 5
 
 int detectionLeft = HIGH;    // no obstacle
 int detectionRigth = HIGH; 
 
-int vL = 55; //Low speed left //60
-int VL = 115; //Hight speed left //125
-int vR = 75; //Low speed right //75
-int VR = 200; //Hight speed right //140
-int v = 90; //speed forward //90
+//the true value will be define later in the code in function of switchgroup
+int vL = 0; //Low speed left //60
+int VL = 0; //Hight speed left //125
+int vR = 0; //Low speed right //75
+int VR = 0; //Hight speed right //140
+int v = 0; //speed forward //90
 
 unsigned long timeLine;
 
@@ -46,6 +49,25 @@ void setup() {
   //pin IRsensor
   pinMode(IRleft_PIN, INPUT); 
   pinMode(IRright_PIN, INPUT); 
+  pinMode(switchGroup, INPUT);
+
+  if(digitalRead(switchGroup) == HIGH){
+    Serial.println("Blue group");
+    vL = 60; //Low speed left
+    VL = 125; //Hight speed left 
+    vR = 75; //Low speed right 
+    VR = 140; //Hight speed right 
+    v = 90; //speed forward 
+  }else{
+    Serial.println("yellow group");
+    vL = 55; //Low speed left 
+    VL = 115; //Hight speed left
+    vR = 75; //Low speed right 
+    VR = 200; //Hight speed right
+    v = 90; //speed forward 
+  }
+
+ 
 }
 
 void loop() {
@@ -56,7 +78,6 @@ void loop() {
   else{
     followingLine();
   }
-
   
 }
 
