@@ -3,10 +3,16 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *LeftMotor = AFMS.getMotor(3);
 Adafruit_DCMotor *RightMotor = AFMS.getMotor(2);
 
-#define switchGroup 8
+int iTest = 0;
+
+#define switchGroup 3 //ground yellow , vcc blue
+#define startPin 8
+
 
 #define IRleft_PIN 4  
 #define IRright_PIN 5
+
+enum {WAIT, PLAY , END} state; 
 
 int detectionLeft = HIGH;    // no obstacle
 int detectionRigth = HIGH; 
@@ -18,7 +24,11 @@ int vR = 0; //Low speed right //75
 int VR = 0; //Hight speed right //140
 int v = 0; //speed forward //90
 
-unsigned long timeLine;
+unsigned long timeLine =0;
+unsigned long timeStartPlay;
+unsigned long timeNow;
+
+bool yellowGroup;
 
 float distance_mm = 0.0;
 const byte TRIGGER_PIN = 7; 
@@ -49,34 +59,83 @@ void setup() {
   //pin IRsensor
   pinMode(IRleft_PIN, INPUT); 
   pinMode(IRright_PIN, INPUT); 
+
+  pinMode(startPin, INPUT);
   pinMode(switchGroup, INPUT);
 
-  if(digitalRead(switchGroup) == HIGH){
-    Serial.println("Blue group");
-    vL = 60; //Low speed left
-    VL = 125; //Hight speed left 
-    vR = 75; //Low speed right 
-    VR = 140; //Hight speed right 
-    v = 90; //speed forward 
-  }else{
-    Serial.println("yellow group");
-    vL = 55; //Low speed left 
-    VL = 115; //Hight speed left
-    vR = 75; //Low speed right 
-    VR = 200; //Hight speed right
-    v = 90; //speed forward 
-  }
+  state = WAIT;
+
+  
 
  
 }
 
 void loop() {
-  measureDistance();
-  if (distance_mm != 0 && distance_mm < 100.0){
-    MoveStop();
-  }
-  else{
-    followingLine();
+  switch(state){
+    case WAIT:
+      if(digitalRead(startPin) == LOW){
+        if(digitalRead(switchGroup) == HIGH){
+          //select group
+          Serial.println("Blue group");
+          yellowGroup = false;
+          vL = 75; //Low speed left
+          VL = 140; //Hight speed left 
+          vR = 85; //Low speed right 
+          VR = 200; //Hight speed right 
+          v = 95; //speed forward 
+        }else{
+          Serial.println("yellow group");
+          yellowGroup = true;
+          vL = 120; //Low speed left 60
+          VL = 180; //Hight speed left
+          vR = 75; //Low speed right 
+          VR = 200; //Hight speed right
+          v = 90; //speed forward 
+        }
+        //TODO start chronos
+        timeStartPlay = millis();
+        timeLine = millis();
+        //Serial.println("BEGIN THE ROUTINE");
+        state = PLAY;
+      }
+      break;
+    case PLAY:
+      timeNow = millis() - timeStartPlay;
+      if(timeNow <= 9500){
+        measureDistance();
+        if (distance_mm != 0 && distance_mm < 100.0){
+          //Serial.print("obstacle :");
+          //Serial.println(distance_mm);
+          //delay(200);
+          MoveStop();
+        }
+        else{
+          bool goals = followingLine();
+  
+          if(goals){
+            state=END;
+            MoveStop();
+            //Serial.println("state end line");
+          }
+        }
+      }
+      else{
+        state = END;
+        MoveStop();
+        //Serial.println("end chronos");
+      }
+      /*if(timeNow >=iTest){
+        iTest+=1000;
+        Serial.print("time :");
+        Serial.println(timeNow);
+      }*/
+      break;
+    case END:
+      //Serial.println("hello");
+      MoveStop();
+      delay(200);
+      break;
+    
   }
   
 }
@@ -145,10 +204,17 @@ bool followingLine(){
     endLine = true;
   }
   else{
-    LeftMotor->setSpeed(v-50);
+    if(yellowGroup){
+    LeftMotor->setSpeed(v-50); //-50
     LeftMotor->run(FORWARD);
     RightMotor->setSpeed(v);
     RightMotor->run(FORWARD);
+    }else{
+      LeftMotor->setSpeed(v); //-50
+      LeftMotor->run(FORWARD);
+      RightMotor->setSpeed(v-50);
+      RightMotor->run(FORWARD);
+    }
     
   }
   return endLine;
