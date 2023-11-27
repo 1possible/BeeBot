@@ -60,7 +60,7 @@ void setup() {
   pinMode(IRleft_PIN, INPUT); 
   pinMode(IRright_PIN, INPUT); 
 
-  pinMode(startPin, INPUT);
+  pinMode(startPin, INPUT_PULLUP);
   pinMode(switchGroup, INPUT);
 
   state = WAIT;
@@ -73,29 +73,29 @@ void setup() {
 void loop() {
   switch(state){
     case WAIT:
-      if(digitalRead(startPin) == LOW){
+      if(digitalRead(startPin)==HIGH){
         if(digitalRead(switchGroup) == HIGH){
           //select group
           Serial.println("Blue group");
           yellowGroup = false;
           vL = 75; //Low speed left
-          VL = 140; //Hight speed left 
-          vR = 85; //Low speed right 
+          VL = 180; //Hight speed left 
+          vR = 75; //Low speed right 
           VR = 200; //Hight speed right 
-          v = 95; //speed forward 
+          v = 100; //speed forward 
         }else{
           Serial.println("yellow group");
           yellowGroup = true;
-          vL = 120; //Low speed left 60
-          VL = 180; //Hight speed left
-          vR = 75; //Low speed right 
-          VR = 200; //Hight speed right
+          vL = 75; //Low speed left //75
+          VL = 230; //Hight speed left
+          vR = 0; //Low speed right //50
+          VR = 180; //Hight speed right
           v = 90; //speed forward 
         }
         //TODO start chronos
         timeStartPlay = millis();
         timeLine = millis();
-        //Serial.println("BEGIN THE ROUTINE");
+        Serial.println("BEGIN THE ROUTINE");
         state = PLAY;
       }
       break;
@@ -104,8 +104,13 @@ void loop() {
       if(timeNow <= 9500){
         measureDistance();
         if (distance_mm != 0 && distance_mm < 100.0){
-          //Serial.print("obstacle :");
-          //Serial.println(distance_mm);
+          Serial.print("obstacle :");
+          Serial.println(distance_mm);
+          /*if(digitalRead(startPin)== HIGH){
+            Serial.println("START : HIGH");
+          }else{
+            Serial.println("START : LOW");
+          }*/
           //delay(200);
           MoveStop();
         }
@@ -115,14 +120,14 @@ void loop() {
           if(goals){
             state=END;
             MoveStop();
-            //Serial.println("state end line");
+            Serial.println("state end line");
           }
         }
       }
       else{
         state = END;
         MoveStop();
-        //Serial.println("end chronos");
+        Serial.println("end chronos");
       }
       /*if(timeNow >=iTest){
         iTest+=1000;
@@ -185,13 +190,13 @@ bool followingLine(){
     RightMotor->run(FORWARD);
     timeLine = millis();
   }else if(detectionLeft == HIGH and detectionRigth == LOW){
-    LeftMotor->setSpeed(vL-10);
+    LeftMotor->setSpeed(vL);
     LeftMotor->run(FORWARD);
     RightMotor->setSpeed(VR);
     RightMotor->run(FORWARD);
     timeLine = millis();;
   }else if(detectionLeft == LOW and detectionRigth == LOW){
-    LeftMotor->setSpeed(v-10);
+    LeftMotor->setSpeed(v);
     LeftMotor->run(FORWARD);
     RightMotor->setSpeed(v);
     RightMotor->run(FORWARD);
@@ -205,14 +210,14 @@ bool followingLine(){
   }
   else{
     if(yellowGroup){
-    LeftMotor->setSpeed(v-50); //-50
+    LeftMotor->setSpeed(v); 
     LeftMotor->run(FORWARD);
-    RightMotor->setSpeed(v);
+    RightMotor->setSpeed(v-50);
     RightMotor->run(FORWARD);
     }else{
-      LeftMotor->setSpeed(v); //-50
+      LeftMotor->setSpeed(v-50); 
       LeftMotor->run(FORWARD);
-      RightMotor->setSpeed(v-50);
+      RightMotor->setSpeed(v);
       RightMotor->run(FORWARD);
     }
     
