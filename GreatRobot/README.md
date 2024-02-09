@@ -6,11 +6,6 @@
 * [About the project](#question-about-the-project)
 * [Getting started](#rocket-getting-started)
     * [Frameworks](#zap-frameworks)
-    * [Prerequesites](#exclamation-prerequesites)
-* [Test](#test)
-* [Documentation](#documentation)
-* [Tree structure](#deciduoustree-tree-structure)
-* [API](#boom-api)
 
 ## **Project participants**
 
