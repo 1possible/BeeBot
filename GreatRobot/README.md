@@ -27,6 +27,4 @@ The purpose of this project is create a robot that will be able to rotate the so
 ### :zap: Library
 
 For the TFT LCD
-- Adafruit TFTLCD Library:1.0.3
-- Adafruit BusIO
-- Adafruit GFX Library
+- MCUFRIEND_kbv
