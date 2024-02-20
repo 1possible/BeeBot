@@ -103,13 +103,14 @@ void requestEvent()
   //ESP_BT.println("message demandé");
   for(int i=0; i < 6; i++){
     if(head_buff != tail_buff){
-      Wire.write(buff[tail_buff]); // respond with message of 6 bytes // as expected by master
+      //Wire.slaveWrite((uint8_t *)buff[tail_buff],1); // respond with message of 6 bytes // as expected by master
+      Wire.print(buff[tail_buff]);
       ESP_BT.println(buff[tail_buff]);
       increaseTail();
       ESP_BT.println(tail_buff);
-    }/*else{
-      //Wire.write(" ");
-    }*/
+    }else{
+      Wire.print(" ");
+    }
   }
   if(head_buff == tail_buff){
     digitalWrite(I2C_Trig_PIN,LOW);
@@ -117,10 +118,9 @@ void requestEvent()
 }
 void receiveEvent(int howMany)
 {
-  while(1 < Wire.available()) // loop through all but the last
+  while(Wire.available()) // loop through all but the last
   {
     char c = Wire.read(); // receive byte as a character
     ESP_BT.print(c);         // print the character
   }
-  ESP_BT.println(); 
 }
