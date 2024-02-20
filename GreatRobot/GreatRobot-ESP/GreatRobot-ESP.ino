@@ -4,15 +4,21 @@
 BluetoothSerial ESP_BT; // Object for Bluetooth
 //https://assiss.github.io/arduino-zhcn/cn/Tutorial/MasterReader.html
 //https://docs.espressif.com/projects/arduino-esp32/en/latest/api/i2c.html
+
+//esp slave
+//https://forum.arduino.cc/t/understanding-esp32-wireslave-example/1000680/7
+//https://docs.espressif.com/projects/arduino-esp32/en/latest/api/i2c.html
 #include <Wire.h>
 
 const int I2C_SDA_PIN = 14;
 const int I2C_SCL_PIN = 27;
 const int I2C_Trig_PIN = 12;
 
-char buff[48];
-int tail_buff = 0;
-int head_buff = 0;
+//char buff[48];
+//int tail_buff = 0;
+//int head_buff = 0;
+int dataToSend = 0;
+int lengthPayload = 6;
 
 bool error= false;
 
@@ -40,11 +46,23 @@ void loop() {
     //Serial.write(ESP_BT.read());
     String dataReceived = ESP_BT.readString(); // Read what we receive
     ESP_BT.println("message recu");
-    for(int i=0; i < dataReceived.length()-2; i++){
+    /*for(int i=0; i < dataReceived.length()-2; i++){
       buff[head_buff] = dataReceived[i];
       increaseHead();
       ESP_BT.println(head_buff);
+    }*/
+    int str_len = dataReceived.length();
+    int str_modulo = str_len%6;
+    if(str_modulo != 0){
+      for(int i = 0; i < 6-str_modulo;i++){
+        dataReceived+=" ";
+        str_len++;
+      }
     }
+    char char_array[str_len];
+    dataReceived.toCharArray(char_array, str_len);
+    Wire.slaveWrite((uint8_t *) char_array, str_len);
+    dataToSend += str_len;
     digitalWrite(I2C_Trig_PIN,HIGH);
     //ESP_BT.print("headbuff : ");
     //ESP_BT.println(head_buff);
@@ -81,7 +99,7 @@ void loop() {
   }
   delay(20);
 }
-void increaseTail(){
+/*void increaseTail(){
   tail_buff++;
   if(tail_buff >= sizeof(buff)){
     tail_buff = 0;
@@ -96,12 +114,12 @@ void increaseHead(){
     error = true;
     ESP_BT.println("error : overflow buffer");
   }
-}
+}*/
 void requestEvent()
 {
   //Wire.write("hello ");
   //ESP_BT.println("message demandé");
-  for(int i=0; i < 6; i++){
+  /*for(int i=0; i < 6; i++){
     if(head_buff != tail_buff){
       //Wire.slaveWrite((uint8_t *)buff[tail_buff],1); // respond with message of 6 bytes // as expected by master
       Wire.print(buff[tail_buff]);
@@ -114,6 +132,11 @@ void requestEvent()
   }
   if(head_buff == tail_buff){
     digitalWrite(I2C_Trig_PIN,LOW);
+  }*/
+  dataToSend = dataToSend - lengthPayload;
+  if(dataToSend <= 0){
+    digitalWrite(I2C_Trig_PIN,LOW);
+    dataToSend = 0;
   }
 }
 void receiveEvent(int howMany)
