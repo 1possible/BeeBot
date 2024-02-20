@@ -34,29 +34,26 @@ void loop() {
   if (ESP_BT.available()) { // Check if we receive anything from Bluetooth
     String dataReceived = ESP_BT.readString(); // Read what we receive
     //ESP_BT.println("message recu");
-    // change the length of the data to be in the payload length
-    int str_len = dataReceived.length();
-    int str_modulo = str_len%6;
-    if(str_modulo != 0){
-      for(int i = 0; i < 6-str_modulo;i++){
-        dataReceived+=" ";
-        str_len++;
+    // change data format and length (for the buffer and payload)
+    int str_len = dataReceived.length()-2;
+    int str_modulo = (str_len%6!=0)?6-(str_len%6):0;
+    char char_array[str_len+str_modulo];
+    for(int i = 0; i < str_len+str_modulo;i++){
+       if(i<str_len){
+        char_array[i]=dataReceived[i];
+      }else{
+        char_array[i]=' ';
       }
     }
-    //change format of data
-    char char_array[str_len];
-    dataReceived.toCharArray(char_array, str_len);
     
-    Wire.slaveWrite((uint8_t *) char_array, str_len);//write the data in the I2C buffer
+    Wire.slaveWrite((uint8_t *) char_array,str_len+str_modulo);//write the data in the I2C buffer
     dataToSend += str_len;
     digitalWrite(I2C_Trig_PIN,HIGH);
   }
-  //delay(20);
 }
 void requestEvent()
 {
-  //Wire.write("hello ");
-  //ESP_BT.println("message demandé");
+  //esp32 send direcly the data in the I2C buffer (prepared before)
   dataToSend = dataToSend - lengthPayload;
   if(dataToSend <= 0){
     digitalWrite(I2C_Trig_PIN,LOW);
