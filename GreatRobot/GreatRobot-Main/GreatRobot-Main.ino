@@ -8,9 +8,13 @@ const byte ECHO_PIN = 6;
 const unsigned long MEASURE_TIMEOUT = 25000UL;
 const float SOUND_SPEED = 340.0 / 1000;
 */
-enum {WAIT, RUN , END} state; 
+enum {TEAMCHOOSE , WAIT, RUN, END} state; 
 unsigned long timeStartRUN;
 unsigned long timeNow;
+
+//lcd
+int team;
+int state = 0;
 
 //esp BLE
 const byte EN_BLE_PIN = 8; 
@@ -20,7 +24,7 @@ String messageBLE = "";
 void setup() {
   // put your setup code here, to run once:
   Wire.begin();
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   /*pinMode(TRIGGER_PIN, OUTPUT);
   digitalWrite(TRIGGER_PIN, LOW);
@@ -55,7 +59,32 @@ void loop() {
   /*measureDistance();
   Serial.print(distance_mm);
   Serial.println(" mm");*/
+
+
   switch(state){
+  	case TEAMCHOOSE:
+  	  String readString;
+      String Q;
+      delay(1);
+      if(Serial.available() > 0){
+        char c = Serial.read();
+        readString += c;
+      }
+      Q = readString;
+      //YELLOW TEAM
+      if (Q == "1"){
+        team = 1;
+        state = WAIT;
+        printBLE("YELLOW Team");
+        break;
+      }
+      //BLUE TEAM
+      if (Q == "2"){
+        team = 2;
+        state = WAIT;
+        printBLE("Blue Team");
+        break;
+      }
     case RUN:
       timeNow = millis()-timeStartRUN;
       if(timeNow >= 3000){
@@ -69,13 +98,16 @@ void loop() {
       
   }
   delay(50);
+}
 
+void startRUNNING(){
+	state = RUN;
+    printBLE("start running");
+    timeStartRUN=millis();
 }
 void msgInstru(String msg){
   if(state == WAIT and msg.indexOf("start") != -1){
-    state = RUN;
-    printBLE("start running");
-    timeStartRUN=millis();
+    startRUNNING();
   }
 }
 void printBLE(String msg){
