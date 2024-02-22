@@ -3,7 +3,10 @@
 // https://www.aranacorp.com/fr/communication-bluetooth-avec-esp32/
 BluetoothSerial ESP_BT; // Object for Bluetooth
 //https://assiss.github.io/arduino-zhcn/cn/Tutorial/MasterReader.html
+//https://assiss.github.io/arduino-zhcn/cn/Tutorial/MasterWriter.html
 //https://docs.espressif.com/projects/arduino-esp32/en/latest/api/i2c.html
+//pin I2C
+//https://docs.arduino.cc/learn/communication/wire/
 
 //esp slave
 //https://forum.arduino.cc/t/understanding-esp32-wireslave-example/1000680/7

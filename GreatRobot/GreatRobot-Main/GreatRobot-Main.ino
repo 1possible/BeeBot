@@ -8,9 +8,14 @@ const byte ECHO_PIN = 6;
 const unsigned long MEASURE_TIMEOUT = 25000UL;
 const float SOUND_SPEED = 340.0 / 1000;
 */
+enum {WAIT, RUN , END} state; 
+unsigned long timeStartRUN;
+unsigned long timeNow;
+
 //esp BLE
 const byte EN_BLE_PIN = 8; 
 const int ESP_addrI2C = 3;
+String messageBLE = "";
 
 void setup() {
   // put your setup code here, to run once:
@@ -22,6 +27,7 @@ void setup() {
   pinMode(ECHO_PIN, INPUT);*/
 
   pinMode(EN_BLE_PIN,INPUT);
+  state = WAIT;
 }
 
 void loop() {
@@ -31,11 +37,11 @@ void loop() {
     Wire.requestFrom(ESP_addrI2C,6);
     while(Wire.available()){
       char c = Wire.read();
-      Serial.print(c);
+      messageBLE+= c;
     }
-    Serial.println();
+    msgInstru(messageBLE);
   }
-  if(Serial.available()){
+  /*if(Serial.available()){
     Serial.print("en_pin");
     Serial.println(en_BLE);
     String dataReceived = Serial.readString();
@@ -44,13 +50,40 @@ void loop() {
       Wire.write(dataReceived[i]);
     }
     Wire.endTransmission(); 
-  }
+  }*/
     
   /*measureDistance();
   Serial.print(distance_mm);
   Serial.println(" mm");*/
+  switch(state){
+    case RUN:
+      timeNow = millis()-timeStartRUN;
+      if(timeNow >= 3000){
+        state = END;
+      }
+      break;
+    case END:
+      printBLE("stop motor");
+      state = WAIT;
+      break;
+      
+  }
   delay(50);
 
+}
+void msgInstru(String msg){
+  if(state == WAIT and msg.indexOf("start") != -1){
+    state = RUN;
+    printBLE("start running");
+    timeStartRUN=millis();
+  }
+}
+void printBLE(String msg){
+    Wire.beginTransmission(ESP_addrI2C);
+    for(int i=0; i < msg.length(); i++){
+      Wire.write(msg[i]);
+    }
+    Wire.endTransmission(); 
 }
 
 /*int measureDistance ()
