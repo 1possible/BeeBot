@@ -59,24 +59,16 @@ bool Touch_getXY(void)
 
 
 int Score = 0;
-int state = 4;
+int state = 0;
 
 void setup(void)
 {
-    Serial.begin(9600);
-    uint16_t ID = tft.readID();
-    Serial.print("TFT ID = 0x");
-    Serial.println(ID, HEX);
-    Serial.println("Calibrate for your Touch Panel");
-    if (ID == 0xD3D3) ID = 0x9486; // write-only shield
-    tft.begin(ID);
-    tft.setRotation(0);            //PORTRAIT
-    
-
-
-    // LCDData->state = LCD_STATE_INIT;
-    // LCDData->ScoreRed = 0;
-    // LCDData->ScoreBlue = 0;
+  pinMode(12, OUTPUT);
+  pinMode(11, OUTPUT);
+  uint16_t ID = tft.readID();
+  if (ID == 0xD3D3) ID = 0x9486; // write-only shield
+  tft.begin(ID);
+  tft.setRotation(0);            //PORTRAIT
 
 }
 
@@ -84,84 +76,90 @@ void setup(void)
  */
 void loop(void)
 {
-  //red_btn.drawButton(true);
-  //tft.fillScreen(RED);
-
-  //blue_btn.drawButton(true);
-  //tft.fillScreen(BLUE);
 
   switch(state){
-      case 0 :
-      {
-        bool down = Touch_getXY();
-        red_btn.press(down && red_btn.contains(pixel_x, pixel_y));
-        blue_btn.press(down && blue_btn.contains(pixel_x, pixel_y));
+    case 0 :
+    {
+      tft.fillScreen(BLACK);
+      //print message
+      tft.setTextSize(4);
+      tft.setCursor(0, 200);
+      tft.setTextColor(WHITE);
+      tft.println("Choose a Team");
+      //button
+      red_btn.initButton(&tft,  100, 260, 100, 40, WHITE, CYAN, BLACK, "RED", 2);
+      blue_btn.initButton(&tft, 220, 260, 100, 40, WHITE, CYAN, BLACK, "BLUE", 2);
+      red_btn.drawButton(false);
+      blue_btn.drawButton(false);
+      state = 1;
+      break;   
+    }
+    case 1 :
+    {
+      bool down = Touch_getXY();
+      red_btn.press(down && red_btn.contains(pixel_x, pixel_y));
+      blue_btn.press(down && blue_btn.contains(pixel_x, pixel_y));
 
-        if (red_btn.justPressed()) {
-          tft.fillScreen(RED);
-          //print message
-          tft.setTextSize(4);
-          tft.setCursor(50, 100);
-          tft.setTextColor(WHITE);
-          tft.println("Estimated");
-          tft.setCursor(90, 130);
-          tft.println("score");
-          tft.setTextSize(20);
-          tft.setCursor(110, 220);
-          tft.println(Score);
-          state = 1;
-        }
-        if (blue_btn.justPressed()) {
-          tft.fillScreen(BLUE);
-          //print message
-          tft.setTextSize(4);
-          tft.setCursor(50, 100);
-          tft.setTextColor(WHITE);
-          tft.println("Estimated");
-          tft.setCursor(90, 130);
-          tft.println("score");
-          tft.setTextSize(20);
-          tft.setCursor(110, 220);
-          tft.println(Score);
-          state = 1;
-        }
-      break;    
-      }
-      case 1 :
-      {
-        back_btn.initButton(&tft,  160, 420, 100, 40, WHITE, CYAN, BLACK, "BACK", 2);
-        back_btn.drawButton(false);
-        state = 2;
-        break;    
-      }
-      case 2 :
-      {
-        bool down = Touch_getXY();
-        back_btn.press(down && back_btn.contains(pixel_x, pixel_y));
-        if (back_btn.justPressed()) {
-          state = 4;
-        }
-
-      break;    
-      }
-
-      case 4:
-      {
-        tft.fillScreen(BLACK);
+      if (red_btn.justPressed()) {
+        tft.fillScreen(RED);
         //print message
         tft.setTextSize(4);
-        tft.setCursor(0, 200);
+        tft.setCursor(50, 100);
         tft.setTextColor(WHITE);
-        tft.println("Choose a Team");
-        //button
-        red_btn.initButton(&tft,  100, 260, 100, 40, WHITE, CYAN, BLACK, "RED", 2);
-        blue_btn.initButton(&tft, 220, 260, 100, 40, WHITE, CYAN, BLACK, "BLUE", 2);
-        red_btn.drawButton(false);
-        blue_btn.drawButton(false);
-        state = 0;
+        tft.println("Estimated");
+        tft.setCursor(90, 130);
+        tft.println("score");
+        tft.setTextSize(20);
+        tft.setCursor(110, 220);
+        tft.println(Score);
+        digitalWrite(12, HIGH);
+
+        Serial.begin(9600);
+        Serial.print("1");
+        Serial.end();
+        state = 2;
         break;
       }
+      if (blue_btn.justPressed()) {
+        tft.fillScreen(BLUE);
+        //print message
+        tft.setTextSize(4);
+        tft.setCursor(50, 100);
+        tft.setTextColor(WHITE);
+        tft.println("Estimated");
+        tft.setCursor(90, 130);
+        tft.println("score");
+        tft.setTextSize(20);
+        tft.setCursor(110, 220);
+        tft.println(Score);
+        digitalWrite(11, HIGH);
+
+        Serial.begin(9600);
+        Serial.print("2");
+        Serial.end();
+        state = 2;
+        break;
+      }
+      break;  
+    }
+    case 2 :
+    {
+      back_btn.initButton(&tft,  160, 420, 100, 40, WHITE, CYAN, BLACK, "BACK", 2);
+      back_btn.drawButton(false);
+      state = 3;
+      break;   
+    }
+
+    case 3:
+    {
+      bool down = Touch_getXY();
+      back_btn.press(down && back_btn.contains(pixel_x, pixel_y));
+      if (back_btn.justPressed()) {
+        digitalWrite(12, LOW);
+        digitalWrite(11, LOW);
+        state = 0;
+      }
+      break;       
+    }
   } 
 }
-
-
