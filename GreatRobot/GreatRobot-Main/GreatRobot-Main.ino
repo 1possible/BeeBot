@@ -14,6 +14,7 @@ const unsigned long MEASURE_TIMEOUT = 25000UL;
 const float SOUND_SPEED = 340.0 / 1000;
 */
 enum {TEAMCHOOSE , WAIT, RUN, END} state; 
+//enum {NODEBUG, DEBUG} debug_state;
 unsigned long timeStartRUN;
 unsigned long timeNow;
 
@@ -56,7 +57,9 @@ void loop() {
   Serial.println(" mm");*/
 
 
-  if(state == TEAMCHOOSE){
+  switch(state){
+    case TEAMCHOOSE:
+    {
   	  String readString;
       String Q;
       delay(1);
@@ -70,29 +73,41 @@ void loop() {
         team = 1;
         state = WAIT;
         printBLE("YELLOW Team");
-        //break;
       }
       //BLUE TEAM
-      if (Q == "2"){
+      else if (Q == "2"){
         team = 2;
         state = WAIT;
         printBLE("Blue Team");
       }
-      //break;
-  }else if(state == RUN){
+      break;
+    }
+    case RUN:
+    {
       //printBLE("RUN cc");
       timeNow = millis()-timeStartRUN;
       //printBLE("RUN "+String(timeNow)+" ms\n");
       if(timeNow >= 3000){
         state = END;
       }
-  }else if(state == END){
+      break;
+    }
+    case END:
+    {
       printBLE("stop motor");
       MotorTwo->run(RELEASE); 
       MotorFour->run(RELEASE);
       state = TEAMCHOOSE;
-      //break;
+      break;
+    }
   }
+  /*switch(debug_state){
+    case DEBUG:
+    {
+      measureDistance();
+      printBLE(String(distance_mm)+ " mm\n");
+    }
+  }*/
   delay(50);
 }
 
