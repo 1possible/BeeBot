@@ -5,7 +5,9 @@
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
 Adafruit_DCMotor *MotorTwo = AFMS.getMotor(2);
 Adafruit_DCMotor *MotorFour = AFMS.getMotor(4);
-
+//IR sensor
+#define IR_left_PIN 9
+#define IR_right_PIN 10
 //sensor distance
 /*float distance_mm = 0.0;
 const byte TRIGGER_PIN = 7; 
@@ -14,30 +16,41 @@ const unsigned long MEASURE_TIMEOUT = 25000UL;
 const float SOUND_SPEED = 340.0 / 1000;
 */
 enum {TEAMCHOOSE , WAIT, RUN, END} state; 
-//enum {NODEBUG, DEBUG} debug_state;
+enum {NODEBUG, DEBUG} debug_state;
+int timeMsgDEBUG = 1000;
 unsigned long timeStartRUN;
+unsigned long timeStartDEBUG=0;
 unsigned long timeNow;
 
 //lcd
 int team;
 
 //esp BLE
-const byte EN_BLE_PIN = 8; 
+#define EN_BLE_PIN 8 
 const int ESP_addrI2C = 3;
 String messageBLE = "";
 
 void setup() {
   // put your setup code here, to run once:
+  //BLE
+  pinMode(EN_BLE_PIN,INPUT);
   Wire.begin();
+  //motor
   AFMS.begin();
+  //serial (comm ard-lcd)
   Serial.begin(9600);
 
+  //IR MOTOR
+  pinMode(IR_left_PIN, INPUT);
+  pinMode(IR_right_PIN, INPUT);
+  //test US sensor
   /*pinMode(TRIGGER_PIN, OUTPUT);
   digitalWrite(TRIGGER_PIN, LOW);
   pinMode(ECHO_PIN, INPUT);*/
 
-  pinMode(EN_BLE_PIN,INPUT);
+  //statemachine
   state = TEAMCHOOSE;
+  debug_state = NODEBUG;
 }
 
 void loop() {
@@ -101,13 +114,21 @@ void loop() {
       break;
     }
   }
-  /*switch(debug_state){
+  switch(debug_state){
     case DEBUG:
     {
-      measureDistance();
-      printBLE(String(distance_mm)+ " mm\n");
+      timeNow = millis() - timeStartDEBUG;
+      if(timeNow > timeMsgDEBUG){
+        timeStartDEBUG = millis();
+        printBLE("leftIR : "+String(digitalRead(IR_left_PIN))+ "\n");
+        printBLE("rightIR : "+String(digitalRead(IR_right_PIN))+ "\n");
+        /*
+        measureDistance();
+        printBLE(String(distance_mm)+ " mm\n");
+        */
+      }
     }
-  }*/
+  }
   delay(50);
 }
 
@@ -128,6 +149,14 @@ void startRUNNING(){
 void msgInstru(String msg){
   if(state == WAIT and msg.indexOf("start") != -1){
     startRUNNING();
+  }else if( msg.indexOf("debug") != -1){
+    if(debug_state == DEBUG){
+      debug_state = NODEBUG;
+      printBLE("debug OFF");
+    }else{
+      debug_state = DEBUG;
+      printBLE("debug ON");
+    }
   }else if( msg.indexOf("state") != -1){
     printBLE("state : "+String(state));
   }else if( msg.indexOf("team") != -1){
