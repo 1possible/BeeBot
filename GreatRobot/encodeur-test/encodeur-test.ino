@@ -1,4 +1,5 @@
 //GreatRobot code test-encodeur
+//https://www.pjrc.com/teensy/td_libs_Encoder.html
 #include <Encoder.h>
 #include <Adafruit_MotorShield.h>
 //motor
