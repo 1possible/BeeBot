@@ -105,7 +105,7 @@ void loop() {
           LeftMotor->setSpeed(0);
           RightMotor->run(RELEASE); 
           LeftMotor->run(RELEASE);
-          timeRight = 2;
+          timeRight = 80;
           timeDodgeRight = 3;
           Serial.println("tourne droite");
           state = DODGERIGHT;
@@ -123,13 +123,13 @@ void loop() {
             timeRight--;
             if (timeDodgeRight > 1){
               timeDodgeRight--;
-              timeRight = 20;
+              timeRight = 80;
               state = DODGELEFT;
               break;
             }
             else if (timeDodgeRight == 1){
               timeDodgeRight--;
-              timeRight = 20;
+              timeRight = 80;
               state = DODGERIGHT;
               break;
             }
@@ -153,7 +153,7 @@ void loop() {
       LeftMotor->setSpeed(225);
       RightMotor->run(BACKWARD); 
       LeftMotor->run(FORWARD);
-      delay(3800);
+      delay(3955);
       RightMotor->setSpeed(225); 
       LeftMotor->setSpeed(225);
       RightMotor->run(FORWARD); 
