@@ -1,6 +1,7 @@
  //GreatRobot code
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
+#include "utility/Adafruit_MS_PWMServoDriver.h"
 //motor
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
 Adafruit_DCMotor *RightMotor = AFMS.getMotor(2);
@@ -10,6 +11,20 @@ int VL = 250; //Hight speed left
 int vR = 75; //Low speed right //50
 int VR = 250; //Hight speed right
 int v = 250; //speed forward 
+
+// Paramètres de l'encodeur et de la roue
+const float stepsPerRevolution = 360; // Nombre de pas par tour de l'encodeur
+const float wheelDiameterCm = 4.5; // Diamètre de la roue en cm
+const float wheelPerimeterCm = 3.14159 * wheelDiameterCm; // Périmètre de la roue
+
+// Variables pour suivre la distance totale parcourue
+float totalDistanceMotorTwo = 0.0;
+float totalDistanceMotorFour = 0.0;
+
+int encoR_PIN = 2;
+int encoL_PIN = 3;
+volatile long encoderCountMotorTwo = 0;
+volatile long encoderCountMotorFour = 0;
 
 //IR sensor
 #define IR_left_PIN 9
@@ -28,6 +43,12 @@ int team = 1; // 1 YELLOW Team 2 BLUE
 void setup() {
   //motor
   AFMS.begin();
+
+  //encoder
+  pinMode(encoR_PIN, INPUT);
+  pinMode(encoL_PIN, INPUT);
+  attachInterrupt(digitalPinToInterrupt(2), encoderMotorTwoChange, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(3), encoderMotorFourChange, CHANGE);
   //serial (comm ard-lcd)
   Serial.begin(9600);
   //Serial.print("setup...");
@@ -41,6 +62,11 @@ void setup() {
 }
 
 void loop() {
+  float distanceMotorTwo = (encoderCountMotorTwo / stepsPerRevolution) * wheelPerimeterCm;
+  float distanceMotorFour = (encoderCountMotorFour / stepsPerRevolution) * wheelPerimeterCm;
+  // Mettre à jour la distance totale parcourue
+  totalDistanceMotorTwo += distanceMotorTwo;
+  totalDistanceMotorFour += distanceMotorFour;
   switch(state){
     case WAIT:
     {
@@ -80,6 +106,20 @@ void loop() {
     }
     case END:
     {
+      // Afficher les distances
+      Serial.print("Distance cycle Motor Two: ");
+      Serial.print(distanceMotorTwo);
+      Serial.println(" cm");
+      Serial.print("Distance cycle Motor Four: ");
+      Serial.print(distanceMotorFour);
+      Serial.println(" cm");
+    
+      Serial.print("Total Distance Motor Two: ");
+      Serial.print(totalDistanceMotorTwo);
+      Serial.println(" cm");
+      Serial.print("Total Distance Motor Four: ");
+      Serial.print(totalDistanceMotorFour);
+      Serial.println(" cm");
       RightMotor->run(RELEASE); 
       LeftMotor->run(RELEASE);
       state = WAIT;
@@ -93,6 +133,20 @@ void startRUN(){
   state = RUN;
   //Serial.println("RUN");
   timeStartRUN = millis();
+}
+
+// Fonctions d'interruption pour les encodeurs
+void encoderMotorTwoChange() {
+  if (digitalRead(2) == HIGH)
+    encoderCountMotorTwo++;
+  else
+    encoderCountMotorTwo--;
+}
+void encoderMotorFourChange() {
+  if (digitalRead(3) == HIGH)
+    encoderCountMotorFour++;
+  else
+    encoderCountMotorFour--;
 }
 
 bool followingLine(){
