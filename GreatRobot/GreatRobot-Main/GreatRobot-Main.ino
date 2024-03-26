@@ -2,15 +2,12 @@
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
+#include "LineFollower.h"
+
 //motor
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
 Adafruit_DCMotor *RightMotor = AFMS.getMotor(2);
 Adafruit_DCMotor *LeftMotor = AFMS.getMotor(3);
-int vL = 75; //Low speed left //75
-int VL = 250; //Hight speed left
-int vR = 75; //Low speed right //50
-int VR = 250; //Hight speed right
-int v = 250; //speed forward 
 
 // Paramètres de l'encodeur et de la roue
 const float stepsPerRevolution = 360; // Nombre de pas par tour de l'encodeur
@@ -31,14 +28,16 @@ const byte TRIGGER_PIN = 7;
 const byte ECHO_PIN1 = 6;
 
 //IR sensor
-#define IR_left_PIN 9
-#define IR_right_PIN 10
+const int IR_left_PIN = 9;
+const int IR_right_PIN = 10;
+LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN);
+
 
 enum { WAIT, RUN, DODGERIGHT, DODGELEFT, END} state; 
 
 unsigned long timeNow;
 unsigned long timeStartRUN;
-unsigned long timeLine = 0;
+
 
 //lcd
 int team = 1; // 1 YELLOW Team 2 BLUE
@@ -78,8 +77,7 @@ void setup() {
   //Serial.print("setup...");
 
   //IR MOTOR
-  pinMode(IR_left_PIN, INPUT);
-  pinMode(IR_right_PIN, INPUT);
+  lineFollower.setup();
 
   //sonor
   pinMode(TRIGGER_PIN, OUTPUT);
@@ -165,7 +163,7 @@ void loop() {
           }
         }
         else{
-          bool endline =followingLine();
+          bool endline =lineFollower.followingLine(LeftMotor,RightMotor);
           if(endline){
             state = END;
           }
@@ -251,42 +249,4 @@ void encoderMotorFourChange() {
     encoderCountMotorFour++;
   else
     encoderCountMotorFour--;
-}
-
-bool followingLine(){
-  bool endLine = false;
-  bool detectionLeft = digitalRead(IR_left_PIN);
-  bool detectionRigth = digitalRead(IR_right_PIN);
-  if(detectionLeft == LOW and detectionRigth == HIGH){
-    LeftMotor->setSpeed(VL);
-    LeftMotor->run(FORWARD);
-    RightMotor->setSpeed(vR);
-    RightMotor->run(BACKWARD);
-    timeLine = millis();
-  }else if(detectionLeft == HIGH and detectionRigth == LOW){
-    LeftMotor->setSpeed(vL);
-    LeftMotor->run(BACKWARD );
-    RightMotor->setSpeed(VR);
-    RightMotor->run(FORWARD);
-    timeLine = millis();;
-  }else if(detectionLeft == LOW and detectionRigth == LOW){
-    LeftMotor->setSpeed(v);
-    LeftMotor->run(FORWARD);
-    RightMotor->setSpeed(v);
-    RightMotor->run(FORWARD);
-    timeLine =millis();
-  }else if(detectionLeft == HIGH and detectionRigth == HIGH and (millis()-timeLine) >250){
-    LeftMotor->setSpeed(0);
-    LeftMotor->run(RELEASE);
-    RightMotor->setSpeed(0);
-    RightMotor->run(RELEASE);
-    endLine = true;
-  }
-  else{//HIGH HIGH without time out
-    LeftMotor->setSpeed(v); 
-    LeftMotor->run(FORWARD);
-    RightMotor->setSpeed(v);
-    RightMotor->run(FORWARD);
-  }
-  return endLine;
 }
