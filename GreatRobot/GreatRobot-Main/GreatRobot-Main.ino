@@ -1,16 +1,26 @@
- //GreatRobot code
+//GreatRobot code
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
-//motor
+/////////////////////////////
+////       MOTORS        ////
+/////////////////////////////
+
+
+// Define constants for motor speeds
+const uint8_t LOW_SPEED = 75;
+const uint8_t HIGH_SPEED = 250;
+
+// Global variables for motor objects
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
-Adafruit_DCMotor *RightMotor = AFMS.getMotor(2);
-Adafruit_DCMotor *LeftMotor = AFMS.getMotor(3);
-int vL = 75; //Low speed left //75
-int VL = 250; //Hight speed left
-int vR = 75; //Low speed right //50
-int VR = 250; //Hight speed right
-int v = 250; //speed forward 
+Adafruit_DCMotor *RightMotor;
+Adafruit_DCMotor *LeftMotor;
+
+// Motors functions
+//void setupMotors();
+//void controlMotors(int leftSpeed, int rightSpeed, int leftDirection, int rightDirection);
+//void stopMotors();
+
 
 // Paramètres de l'encodeur et de la roue
 const float stepsPerRevolution = 360; // Nombre de pas par tour de l'encodeur
@@ -65,7 +75,7 @@ int measureDistance (const byte x, const byte y)
 
 void setup() {
   //motor
-  AFMS.begin();
+  setupMotors();
 
   //encoder
   pinMode(encoR_PIN, INPUT);
@@ -129,10 +139,7 @@ void loop() {
       }
       else{
         if (distance_mm1 != 0 && distance_mm1 < 100.0){
-          RightMotor->setSpeed(0); 
-          LeftMotor->setSpeed(0);
-          RightMotor->run(RELEASE); 
-          LeftMotor->run(RELEASE);
+          controlMotors(0, 0, RELEASE, RELEASE);
           timeRight = 80;
           timeDodgeRight = 3;
           Serial.println("tourne droite");
@@ -177,15 +184,9 @@ void loop() {
    case DODGERIGHT:
     {
       //angle droit
-      RightMotor->setSpeed(225); 
-      LeftMotor->setSpeed(225);
-      RightMotor->run(BACKWARD); 
-      LeftMotor->run(FORWARD);
+      controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, BACKWARD);
       delay(3955);
-      RightMotor->setSpeed(225); 
-      LeftMotor->setSpeed(225);
-      RightMotor->run(FORWARD); 
-      LeftMotor->run(FORWARD);
+      controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
       // timeDodgeRight += 1;
       state = RUN;
       break;
@@ -193,15 +194,9 @@ void loop() {
     case DODGELEFT:
     {
       //angle droit
-      RightMotor->setSpeed(225); 
-      LeftMotor->setSpeed(225);
-      RightMotor->run(FORWARD); 
-      LeftMotor->run(BACKWARD);
+      controlMotors(HIGH_SPEED, HIGH_SPEED, BACKWARD, FORWARD);
       delay(3800);
-      RightMotor->setSpeed(225); 
-      LeftMotor->setSpeed(225);
-      RightMotor->run(FORWARD); 
-      LeftMotor->run(FORWARD);
+      controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
       
       // timeDodgeLeft += 1;
       state = RUN;
@@ -224,8 +219,7 @@ void loop() {
       Serial.print(totalDistanceMotorFour);
       Serial.println(" cm");
 
-      RightMotor->run(RELEASE); 
-      LeftMotor->run(RELEASE);
+      stopMotors();
       state = WAIT;
       //Serial.println("END");
       break;
@@ -258,35 +252,42 @@ bool followingLine(){
   bool detectionLeft = digitalRead(IR_left_PIN);
   bool detectionRigth = digitalRead(IR_right_PIN);
   if(detectionLeft == LOW and detectionRigth == HIGH){
-    LeftMotor->setSpeed(VL);
-    LeftMotor->run(FORWARD);
-    RightMotor->setSpeed(vR);
-    RightMotor->run(BACKWARD);
+    controlMotors(HIGH_SPEED, LOW_SPEED, FORWARD, BACKWARD);
     timeLine = millis();
   }else if(detectionLeft == HIGH and detectionRigth == LOW){
-    LeftMotor->setSpeed(vL);
-    LeftMotor->run(BACKWARD );
-    RightMotor->setSpeed(VR);
-    RightMotor->run(FORWARD);
-    timeLine = millis();;
+    controlMotors(LOW_SPEED, HIGH_SPEED, BACKWARD, FORWARD);
+    timeLine = millis();
   }else if(detectionLeft == LOW and detectionRigth == LOW){
-    LeftMotor->setSpeed(v);
-    LeftMotor->run(FORWARD);
-    RightMotor->setSpeed(v);
-    RightMotor->run(FORWARD);
+    controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
     timeLine =millis();
   }else if(detectionLeft == HIGH and detectionRigth == HIGH and (millis()-timeLine) >250){
-    LeftMotor->setSpeed(0);
-    LeftMotor->run(RELEASE);
-    RightMotor->setSpeed(0);
-    RightMotor->run(RELEASE);
+    stopMotors();
     endLine = true;
   }
   else{//HIGH HIGH without time out
-    LeftMotor->setSpeed(v); 
-    LeftMotor->run(FORWARD);
-    RightMotor->setSpeed(v);
-    RightMotor->run(FORWARD);
+    controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
   }
   return endLine;
+}
+
+// Function to initialize motors
+void setupMotors() {
+  AFMS.begin();
+  RightMotor = AFMS.getMotor(2);
+  LeftMotor = AFMS.getMotor(3);
+}
+
+void controlMotors(uint8_t leftSpeed, uint8_t rightSpeed, uint8_t leftDirection, uint8_t rightDirection) {
+  LeftMotor->setSpeed(leftSpeed); 
+  LeftMotor->run(leftDirection);
+  RightMotor->setSpeed(rightSpeed);
+  RightMotor->run(rightDirection);
+}
+
+// Function to stop motors
+void stopMotors() {
+  LeftMotor->setSpeed(0); 
+  LeftMotor->run(RELEASE);
+  RightMotor->setSpeed(0);
+  RightMotor->run(RELEASE);
 }
