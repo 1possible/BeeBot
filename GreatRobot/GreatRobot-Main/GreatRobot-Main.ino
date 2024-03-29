@@ -33,10 +33,11 @@ const int IR_right_PIN = 10;
 LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN);
 
 
-enum { WAIT, RUN, DODGERIGHT, DODGELEFT, END} state; 
+enum { WAIT, RUN, STEP_FORWARD, STEP_BACKWARD, DODGERIGHT, DODGELEFT, END} state; 
 
 unsigned long timeNow;
 unsigned long timeStartRUN;
+unsigned long timeStartStep;
 
 
 //lcd
@@ -165,13 +166,40 @@ void loop() {
         else{
           bool endline =lineFollower.followingLine(LeftMotor,RightMotor);
           if(endline){
-            state = END;
+            timeStartStep= millis();
+            state = STEP_FORWARD;
           }
         }
         
       }
       break;
     }
+   case STEP_FORWARD:
+   {
+      if(millis()-timeStartStep > 1000){
+        timeStartStep= millis();
+        state = STEP_BACKWARD;
+      }else{
+        RightMotor->setSpeed(225); 
+        LeftMotor->setSpeed(225);
+        RightMotor->run(FORWARD); 
+        LeftMotor->run(FORWARD);
+      }
+      break;
+   }
+   case STEP_BACKWARD:
+   {
+      if(millis()-timeStartStep > 1000){
+        timeStartStep= millis();
+        state = END;
+      }else{
+        RightMotor->setSpeed(225); 
+        LeftMotor->setSpeed(225);
+        RightMotor->run(BACKWARD); 
+        LeftMotor->run(BACKWARD);
+      }
+      break;
+   }
    case DODGERIGHT:
     {
       //angle droit
