@@ -1,4 +1,4 @@
- //GreatRobot code
+//GreatRobot code
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
@@ -234,6 +234,7 @@ void loop() {
 void startRUN(){
   state = RUN;
   //Serial.println("RUN");
+  lineFollower.setTeam(team);
   timeStartRUN = millis();
 }
 

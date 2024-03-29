@@ -10,8 +10,12 @@ public:
   LineFollower(int IR_left_pin,int IR_right_pin);
   void setup();
   bool followingLine(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor);
+  void setTeam(int team);
 private:
   // MARK: Variables
+  bool detect_main_Right ;
+  bool rotation_Right ;
+  enum {RUN,DOUBLE_DETECT,  RETURN_TO_LINE_1 ,RETURN_TO_LINE_2, END} state_line;
   int IR_left_PIN;
   int IR_right_PIN;
   const int vL = 75; //Low speed left //75
@@ -19,9 +23,14 @@ private:
   const int vR = 75; //Low speed right //50
   const int VR = 255; //Hight speed right
   const int v = 255; //speed forward 
+  const unsigned long time_to_end = 250;
+  unsigned long timeLineLength;
   // Debuging Identifier
   //String debugIdentifier = "[SAMPLE MANAGER] | ";
-  // Private constructor to prevent direct instantiation
+  //Function
+  void rotation(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor);
+  void moveForward(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor);
+  void followingLine_RUN(bool detectionLeft,bool detectionRigth,Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor);
 };
 
 
