@@ -1,25 +1,21 @@
 //GreatRobot code
 #include <Wire.h>
-#include <Adafruit_MotorShield.h>
-#include "utility/Adafruit_MS_PWMServoDriver.h"
-/////////////////////////////
-////       MOTORS        ////
-/////////////////////////////
+#include "CommunicationArduinoLCD.h"
+#include "Motor.h"
+
+// Create an instances of class
+CommunicationArduinoLCD communicationArduinoLCD;
+Motor motor;
 
 
 // Define constants for motor speeds
 const uint8_t LOW_SPEED = 75;
 const uint8_t HIGH_SPEED = 250;
 
-// Global variables for motor objects
-Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
-Adafruit_DCMotor *RightMotor;
-Adafruit_DCMotor *LeftMotor;
+// Define constant for lcd team
+int team = 1; // 1 YELLOW Team 2 BLUE
 
-// Motors functions
-//void setupMotors();
-//void controlMotors(int leftSpeed, int rightSpeed, int leftDirection, int rightDirection);
-//void stopMotors();
+
 
 
 // Paramètres de l'encodeur et de la roue
@@ -36,7 +32,7 @@ int encoL_PIN = 3;
 volatile long encoderCountMotorTwo = 0;
 volatile long encoderCountMotorFour = 0;
 
-//pin sonor sensor
+// Capteur sonore
 const byte TRIGGER_PIN = 7; 
 const byte ECHO_PIN1 = 6;
 
@@ -50,8 +46,8 @@ unsigned long timeNow;
 unsigned long timeStartRUN;
 unsigned long timeLine = 0;
 
-//lcd
-int team = 1; // 1 YELLOW Team 2 BLUE
+
+//// Capteur sonore
 
 //sonor sensor constant
 float distance_mm1 = 0.0;
@@ -59,6 +55,7 @@ const unsigned long MEASURE_TIMEOUT = 22000UL;
 const float SOUND_SPEED = 340.0 / 1000;
 int timeRight = 0;
 int timeDodgeRight = 0;
+
 
 int measureDistance (const byte x, const byte y)
 {
@@ -75,7 +72,7 @@ int measureDistance (const byte x, const byte y)
 
 void setup() {
   //motor
-  setupMotors();
+  motor.setupMotors();
 
   //encoder
   pinMode(encoR_PIN, INPUT);
@@ -91,7 +88,7 @@ void setup() {
   pinMode(IR_left_PIN, INPUT);
   pinMode(IR_right_PIN, INPUT);
 
-  //sonor
+  // Capteur sonore
   pinMode(TRIGGER_PIN, OUTPUT);
   digitalWrite(TRIGGER_PIN, LOW); // La broche TRIGGER doit être à LOW au repos
   pinMode(ECHO_PIN1, INPUT);
@@ -110,36 +107,21 @@ void loop() {
   switch(state){
     case WAIT:
     {
-  	  String readString;
-      String Q;
-      //delay(1);
-      if(Serial.available() > 0){
-        char c = Serial.read();
-        readString += c;
-      }
-      Q = readString;
-      //YELLOW TEAM
-      if (Q == "1"){
-        team = 1;
-        startRUN();
-      }
-      //BLUE TEAM
-      else if (Q == "2"){
-        team = 2;
-        startRUN();
-      }
+      communicationArduinoLCD.chooseTeam();
       break;
     }
     case RUN:
     {
       timeNow = millis()-timeStartRUN;
-      distance_mm1 = measureDistance(TRIGGER_PIN, ECHO_PIN1);
+      distance_mm1 = measureDistance(TRIGGER_PIN, ECHO_PIN1); // capteur sonore appel
       if(timeNow >= 120000){
         state = END;
       }
       else{
+
+        //capteur sonore
         if (distance_mm1 != 0 && distance_mm1 < 100.0){
-          controlMotors(0, 0, RELEASE, RELEASE);
+          motor.controlMotors(0, 0, RELEASE, RELEASE);
           timeRight = 80;
           timeDodgeRight = 3;
           Serial.println("tourne droite");
@@ -170,8 +152,8 @@ void loop() {
             }
             break;
           }
-        }
-        else{
+        } // Capteur sonore fin
+        else{ // sinon continue de suivre la ligne
           bool endline =followingLine();
           if(endline){
             state = END;
@@ -184,9 +166,9 @@ void loop() {
    case DODGERIGHT:
     {
       //angle droit
-      controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, BACKWARD);
+      motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, BACKWARD);
       delay(3955);
-      controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
+      motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
       // timeDodgeRight += 1;
       state = RUN;
       break;
@@ -194,9 +176,9 @@ void loop() {
     case DODGELEFT:
     {
       //angle droit
-      controlMotors(HIGH_SPEED, HIGH_SPEED, BACKWARD, FORWARD);
+      motor.controlMotors(HIGH_SPEED, HIGH_SPEED, BACKWARD, FORWARD);
       delay(3800);
-      controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
+      motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
       
       // timeDodgeLeft += 1;
       state = RUN;
@@ -219,7 +201,7 @@ void loop() {
       Serial.print(totalDistanceMotorFour);
       Serial.println(" cm");
 
-      stopMotors();
+      motor.stopMotors();
       state = WAIT;
       //Serial.println("END");
       break;
@@ -252,42 +234,20 @@ bool followingLine(){
   bool detectionLeft = digitalRead(IR_left_PIN);
   bool detectionRigth = digitalRead(IR_right_PIN);
   if(detectionLeft == LOW and detectionRigth == HIGH){
-    controlMotors(HIGH_SPEED, LOW_SPEED, FORWARD, BACKWARD);
+    motor.controlMotors(HIGH_SPEED, LOW_SPEED, FORWARD, BACKWARD);
     timeLine = millis();
   }else if(detectionLeft == HIGH and detectionRigth == LOW){
-    controlMotors(LOW_SPEED, HIGH_SPEED, BACKWARD, FORWARD);
+    motor.controlMotors(LOW_SPEED, HIGH_SPEED, BACKWARD, FORWARD);
     timeLine = millis();
   }else if(detectionLeft == LOW and detectionRigth == LOW){
-    controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
+    motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
     timeLine =millis();
   }else if(detectionLeft == HIGH and detectionRigth == HIGH and (millis()-timeLine) >250){
-    stopMotors();
+    motor.stopMotors();
     endLine = true;
   }
   else{//HIGH HIGH without time out
-    controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
+    motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
   }
   return endLine;
-}
-
-// Function to initialize motors
-void setupMotors() {
-  AFMS.begin();
-  RightMotor = AFMS.getMotor(2);
-  LeftMotor = AFMS.getMotor(3);
-}
-
-void controlMotors(uint8_t leftSpeed, uint8_t rightSpeed, uint8_t leftDirection, uint8_t rightDirection) {
-  LeftMotor->setSpeed(leftSpeed); 
-  LeftMotor->run(leftDirection);
-  RightMotor->setSpeed(rightSpeed);
-  RightMotor->run(rightDirection);
-}
-
-// Function to stop motors
-void stopMotors() {
-  LeftMotor->setSpeed(0); 
-  LeftMotor->run(RELEASE);
-  RightMotor->setSpeed(0);
-  RightMotor->run(RELEASE);
 }
