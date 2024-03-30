@@ -2,19 +2,26 @@
 #include <Wire.h>
 #include "CommunicationArduinoLCD.h"
 #include "Motor.h"
+#include "SonarSensor.h"
 
-// Create an instances of class
+// DEFINE PINS
+// Sonar sensor pins
+const byte TRIGGER_PIN = 7;
+const byte ECHO_PIN = 6;
+
+// Creating instances for classes
 CommunicationArduinoLCD communicationArduinoLCD;
 Motor motor;
+SonarSensor sonar(TRIGGER_PIN, ECHO_PIN);
 
-
-// Define constants for motor speeds
+// DEFINE CONSTANTS
+// motor speeds
 const uint8_t LOW_SPEED = 75;
 const uint8_t HIGH_SPEED = 250;
-
-// Define constant for lcd team
+// Lcd team
 int team = 1; // 1 YELLOW Team 2 BLUE
-
+// sonor sensor
+float distance_mm1 = 0.0; // pre declare variables for sensor captor (je pense pas que c'est nécessaire mais au cas zou)
 
 
 
@@ -32,9 +39,6 @@ int encoL_PIN = 3;
 volatile long encoderCountMotorTwo = 0;
 volatile long encoderCountMotorFour = 0;
 
-// Capteur sonore
-const byte TRIGGER_PIN = 7; 
-const byte ECHO_PIN1 = 6;
 
 //IR sensor
 #define IR_left_PIN 9
@@ -49,30 +53,16 @@ unsigned long timeLine = 0;
 
 //// Capteur sonore
 
-//sonor sensor constant
-float distance_mm1 = 0.0;
-const unsigned long MEASURE_TIMEOUT = 22000UL;
-const float SOUND_SPEED = 340.0 / 1000;
 int timeRight = 0;
 int timeDodgeRight = 0;
 
 
-int measureDistance (const byte x, const byte y)
-{
-  /* 1. Lance une mesure de distance en envoyant une impulsion HIGH de 10µs sur la broche TRIGGER */
-  digitalWrite(x, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(x, LOW);
-  /* 2. Mesure le temps entre l'envoi de l'impulsion ultrasonique et son écho (si il existe) */
-  unsigned long measure = pulseIn(y, HIGH, MEASURE_TIMEOUT);
-  /* 3. Calcul la distance à partir du temps mesuré */
-  int test = measure / 2.0 * SOUND_SPEED; 
-  return test;
-}
-
 void setup() {
   //motor
   motor.setupMotors();
+
+  // sonar sensor
+  sonar.setup();
 
   //encoder
   pinMode(encoR_PIN, INPUT);
@@ -88,11 +78,6 @@ void setup() {
   pinMode(IR_left_PIN, INPUT);
   pinMode(IR_right_PIN, INPUT);
 
-  // Capteur sonore
-  pinMode(TRIGGER_PIN, OUTPUT);
-  digitalWrite(TRIGGER_PIN, LOW); // La broche TRIGGER doit être à LOW au repos
-  pinMode(ECHO_PIN1, INPUT);
-  
   //statemachine
   state = WAIT;
 }
@@ -113,7 +98,7 @@ void loop() {
     case RUN:
     {
       timeNow = millis()-timeStartRUN;
-      distance_mm1 = measureDistance(TRIGGER_PIN, ECHO_PIN1); // capteur sonore appel
+      float distance_mm1 = sonar.measureDistance();
       if(timeNow >= 120000){
         state = END;
       }
