@@ -1,18 +1,27 @@
 //GreatRobot code
 #include <Wire.h>
+#include <Arduino.h>
 #include "CommunicationArduinoLCD.h"
 #include "Motor.h"
 #include "SonarSensor.h"
+#include "Encoder.h"
+
+
+
 
 // DEFINE PINS
 // Sonar sensor pins
 const byte TRIGGER_PIN = 7;
 const byte ECHO_PIN = 6;
 
+
+
 // Creating instances for classes
 CommunicationArduinoLCD communicationArduinoLCD;
 Motor motor;
 SonarSensor sonar(TRIGGER_PIN, ECHO_PIN);
+
+
 
 // DEFINE CONSTANTS
 // motor speeds
@@ -22,6 +31,8 @@ const uint8_t HIGH_SPEED = 250;
 int team = 1; // 1 YELLOW Team 2 BLUE
 // sonor sensor
 float distance_mm1 = 0.0; // pre declare variables for sensor captor (je pense pas que c'est nécessaire mais au cas zou)
+
+
 
 
 
@@ -52,17 +63,17 @@ unsigned long timeLine = 0;
 
 
 //// Capteur sonore
-
 int timeRight = 0;
 int timeDodgeRight = 0;
 
 
 void setup() {
-  //motor
+  // motor
   motor.setupMotors();
 
   // sonar sensor
   sonar.setup();
+
 
   //encoder
   pinMode(encoR_PIN, INPUT);
@@ -89,6 +100,9 @@ void loop() {
   totalDistanceMotorTwo += distanceMotorTwo;
   totalDistanceMotorFour += distanceMotorFour;
 
+  
+  
+
   switch(state){
     case WAIT:
     {
@@ -103,7 +117,6 @@ void loop() {
         state = END;
       }
       else{
-
         //capteur sonore
         if (distance_mm1 != 0 && distance_mm1 < 100.0){
           motor.controlMotors(0, 0, RELEASE, RELEASE);
@@ -186,6 +199,9 @@ void loop() {
       Serial.print(totalDistanceMotorFour);
       Serial.println(" cm");
 
+
+      delay(1000); // Adjust delay as needed
+
       motor.stopMotors();
       state = WAIT;
       //Serial.println("END");
@@ -200,19 +216,6 @@ void startRUN(){
   timeStartRUN = millis();
 }
 
-// Fonctions d'interruption pour les encodeurs
-void encoderMotorTwoChange() {
-  if (digitalRead(2) == HIGH)
-    encoderCountMotorTwo++;
-  else
-    encoderCountMotorTwo--;
-}
-void encoderMotorFourChange() {
-  if (digitalRead(3) == HIGH)
-    encoderCountMotorFour++;
-  else
-    encoderCountMotorFour--;
-}
 
 bool followingLine(){
   bool endLine = false;
