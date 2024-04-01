@@ -15,12 +15,6 @@ private:
   // MARK: Variables
   int IR_left_PIN;
   int IR_right_PIN;
-  // const int vL = 75; //Low speed left //75
-  // const int VL = 255; //Hight speed left
-  // const int vR = 75; //Low speed right //50
-  // const int VR = 255; //Hight speed right
-  // const int v = 255; //speed forward 
-
   Motor &motor;
 
   // Debuging Identifier
