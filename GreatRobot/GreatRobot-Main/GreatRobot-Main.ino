@@ -4,24 +4,21 @@
 #include "CommunicationArduinoLCD.h"
 #include "Motor.h"
 #include "SonarSensor.h"
-#include "Encoder.h"
-
-
-
+#include "EncoderLogic.h"
 
 // DEFINE PINS
 // Sonar sensor pins
 const byte TRIGGER_PIN = 7;
 const byte ECHO_PIN = 6;
-
-
+// Encoder
+const int encoR_PIN = 2;
+const int encoL_PIN = 3;
 
 // Creating instances for classes
 CommunicationArduinoLCD communicationArduinoLCD;
 Motor motor;
 SonarSensor sonar(TRIGGER_PIN, ECHO_PIN);
-
-
+EncoderLogic encoderLogic(encoR_PIN, encoL_PIN);
 
 // DEFINE CONSTANTS
 // motor speeds
@@ -33,22 +30,6 @@ int team = 1; // 1 YELLOW Team 2 BLUE
 float distance_mm1 = 0.0; // pre declare variables for sensor captor (je pense pas que c'est nécessaire mais au cas zou)
 
 
-
-
-
-// Paramètres de l'encodeur et de la roue
-const float stepsPerRevolution = 360; // Nombre de pas par tour de l'encodeur
-const float wheelDiameterCm = 4.5; // Diamètre de la roue en cm
-const float wheelPerimeterCm = 3.14159 * wheelDiameterCm; // Périmètre de la roue
-
-// Variables pour suivre la distance totale parcourue
-float totalDistanceMotorTwo = 0.0;
-float totalDistanceMotorFour = 0.0;
-
-int encoR_PIN = 2;
-int encoL_PIN = 3;
-volatile long encoderCountMotorTwo = 0;
-volatile long encoderCountMotorFour = 0;
 
 
 //IR sensor
@@ -74,13 +55,6 @@ void setup() {
   // sonar sensor
   sonar.setup();
 
-
-  //encoder
-  pinMode(encoR_PIN, INPUT);
-  pinMode(encoL_PIN, INPUT);
-  attachInterrupt(digitalPinToInterrupt(2), encoderMotorTwoChange, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(3), encoderMotorFourChange, CHANGE);
-
   //serial (comm ard-lcd)
   Serial.begin(9600);
   //Serial.print("setup...");
@@ -94,15 +68,8 @@ void setup() {
 }
 
 void loop() {
-  float distanceMotorTwo = (encoderCountMotorTwo / stepsPerRevolution) * wheelPerimeterCm;
-  float distanceMotorFour = (encoderCountMotorFour / stepsPerRevolution) * wheelPerimeterCm;
-  // Mettre à jour la distance totale parcourue
-  totalDistanceMotorTwo += distanceMotorTwo;
-  totalDistanceMotorFour += distanceMotorFour;
-
+  encoderLogic.update();
   
-  
-
   switch(state){
     case WAIT:
     {
@@ -184,21 +151,21 @@ void loop() {
     }
     case END:
     {
-      // Afficher les distances
       Serial.print("Distance cycle Motor Two: ");
-      Serial.print(distanceMotorTwo);
-      Serial.println(" cm");
-      Serial.print("Distance cycle Motor Four: ");
-      Serial.print(distanceMotorFour);
-      Serial.println(" cm");
-    
-      Serial.print("Total Distance Motor Two: ");
-      Serial.print(totalDistanceMotorTwo);
-      Serial.println(" cm");
-      Serial.print("Total Distance Motor Four: ");
-      Serial.print(totalDistanceMotorFour);
+      Serial.print(encoderLogic.getDistanceMotorTwo());
       Serial.println(" cm");
 
+      Serial.print("Distance cycle Motor Four: ");
+      Serial.print(encoderLogic.getDistanceMotorFour());
+      Serial.println(" cm");
+
+      Serial.print("Total Distance Motor Two: ");
+      Serial.print(encoderLogic.getTotalDistanceMotorTwo());
+      Serial.println(" cm");
+
+      Serial.print("Total Distance Motor Four: ");
+      Serial.print(encoderLogic.getTotalDistanceMotorFour());
+      Serial.println(" cm");
 
       delay(1000); // Adjust delay as needed
 
