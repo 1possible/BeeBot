@@ -79,7 +79,7 @@ bool LineFollower::followingLine(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *R
     }
     case END:
     {
-      endLine = false;
+      endLine = true;
       LeftMotor->setSpeed(0);
       LeftMotor->run(RELEASE);
       RightMotor->setSpeed(0);

@@ -23,7 +23,7 @@ private:
   const int vR = 75; //Low speed right //50
   const int VR = 255; //Hight speed right
   const int v = 255; //speed forward 
-  const unsigned long time_to_end = 250;
+  const unsigned long time_to_end = 500;
   unsigned long timeLineLength;
   // Debuging Identifier
   //String debugIdentifier = "[SAMPLE MANAGER] | ";
