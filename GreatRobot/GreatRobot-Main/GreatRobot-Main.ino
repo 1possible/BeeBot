@@ -236,7 +236,7 @@ void loop() {
       distance_mm2 = measureDistance(TRIGGER_PIN, ECHO_PIN2);
       distance_mm3 = measureDistance(TRIGGER_PIN, ECHO_PIN3);
       distance_mm4 = measureDistance(TRIGGER_PIN, ECHO_PIN4);
-      if (distance_mm1 == 0 && distance_mm2 == 0 && distance_mm3 == 0 && distance_mm4 == 0){
+      if ((distance_mm1 == 0 || distance_mm1 > 100) && (distance_mm2 == 0 || distance_mm2 > 100) && (distance_mm3 == 0 || distance_mm3 > 100) && (distance_mm4 == 0 || distance_mm4 > 100)){
         state = RUN;
       }
       break;
