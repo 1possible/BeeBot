@@ -24,8 +24,11 @@ volatile long encoderCountMotorTwo = 0;
 volatile long encoderCountMotorFour = 0;
 
 //pin sonor sensor
-const byte TRIGGER_PIN = 7; 
-const byte ECHO_PIN1 = 6;
+const byte TRIGGER_PIN = 8; 
+const byte ECHO_PIN1 = 7;
+const byte ECHO_PIN2 = 6;  
+const byte ECHO_PIN3 = 5;
+const byte ECHO_PIN4 = 4;  
 
 //IR sensor
 const int IR_left_PIN = 9;
@@ -36,7 +39,7 @@ LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN);
 const int start_switch_PIN = 11;
 
 
-enum { TEAM_CHOICE, WAIT, RUN, STEP_FORWARD, STEP_BACKWARD, DODGERIGHT, DODGELEFT, END} state; 
+enum { TEAM_CHOICE, WAIT, RUN, STEP_FORWARD, STEP_BACKWARD, HOMOLOGATION, DODGERIGHT, DODGELEFT, END} state; 
 
 unsigned long timeNow;
 unsigned long timeStartRUN;
@@ -48,6 +51,9 @@ int team = 1; // 1 YELLOW Team 2 BLUE
 
 //sonor sensor constant
 float distance_mm1 = 0.0;
+float distance_mm2 = 0.0;
+float distance_mm3 = 0.0;
+float distance_mm4 = 0.0;
 const unsigned long MEASURE_TIMEOUT = 22000UL;
 const float SOUND_SPEED = 340.0 / 1000;
 int timeRight = 0;
@@ -90,6 +96,12 @@ void setup() {
   pinMode(TRIGGER_PIN, OUTPUT);
   digitalWrite(TRIGGER_PIN, LOW); // La broche TRIGGER doit être à LOW au repos
   pinMode(ECHO_PIN1, INPUT);
+  /* Initialise les broches */
+  pinMode(ECHO_PIN2, INPUT);
+  /* Initialise les broches */
+  pinMode(ECHO_PIN3, INPUT);
+  /* Initialise les broches */
+  pinMode(ECHO_PIN4, INPUT);
   
   //statemachine
   state = TEAM_CHOICE;
@@ -137,6 +149,9 @@ void loop() {
     {
       timeNow = millis()-timeStartRUN;
       distance_mm1 = measureDistance(TRIGGER_PIN, ECHO_PIN1);
+      distance_mm2 = measureDistance(TRIGGER_PIN, ECHO_PIN2);
+      distance_mm3 = measureDistance(TRIGGER_PIN, ECHO_PIN3);
+      distance_mm4 = measureDistance(TRIGGER_PIN, ECHO_PIN4);
       if(timeNow >= 120000){
         Serial.println("chrono off");
         state = END;
@@ -147,37 +162,34 @@ void loop() {
           LeftMotor->setSpeed(0);
           RightMotor->run(RELEASE); 
           LeftMotor->run(RELEASE);
-          timeRight = 80;
-          timeDodgeRight = 3;
-          Serial.println("tourne droite");
-          state = DODGERIGHT;
+          state = HOMOLOGATION;
           break;
         }
-        if (timeDodgeRight > 0){
-          //tour par la droite
-          if (timeRight > 1) {
-            Serial.println("timeRight");
-            Serial.println(timeRight);
-            timeRight--;
-            break;
-          }
-          else if (timeRight == 1){
-            timeRight--;
-            if (timeDodgeRight > 1){
-              timeDodgeRight--;
-              timeRight = 80;
-              state = DODGELEFT;
-              break;
-            }
-            else if (timeDodgeRight == 1){
-              timeDodgeRight--;
-              timeRight = 80;
-              state = DODGERIGHT;
-              break;
-            }
-            break;
-          }
+        if (distance_mm2 != 0 && distance_mm2 < 100.0){
+          RightMotor->setSpeed(0); 
+          LeftMotor->setSpeed(0);
+          RightMotor->run(RELEASE); 
+          LeftMotor->run(RELEASE);
+          state = HOMOLOGATION;
+          break;
         }
+        if (distance_mm3 != 0 && distance_mm3 < 100.0){
+          RightMotor->setSpeed(0); 
+          LeftMotor->setSpeed(0);
+          RightMotor->run(RELEASE); 
+          LeftMotor->run(RELEASE);
+          state = HOMOLOGATION;
+          break;
+        }
+        if (distance_mm4 != 0 && distance_mm4 < 100.0){
+          RightMotor->setSpeed(0); 
+          LeftMotor->setSpeed(0);
+          RightMotor->run(RELEASE); 
+          LeftMotor->run(RELEASE);
+          state = HOMOLOGATION;
+          break;
+        }
+        
         else{
           bool endline =lineFollower.followingLine(LeftMotor,RightMotor);
           if(endline){
@@ -218,38 +230,17 @@ void loop() {
       }
       break;
    }
-   case DODGERIGHT:
+    case HOMOLOGATION:
     {
-      //angle droit
-      RightMotor->setSpeed(225); 
-      LeftMotor->setSpeed(225);
-      RightMotor->run(BACKWARD); 
-      LeftMotor->run(FORWARD);
-      delay(3955);
-      RightMotor->setSpeed(225); 
-      LeftMotor->setSpeed(225);
-      RightMotor->run(FORWARD); 
-      LeftMotor->run(FORWARD);
-      // timeDodgeRight += 1;
-      state = RUN;
+      distance_mm1 = measureDistance(TRIGGER_PIN, ECHO_PIN1);
+      distance_mm2 = measureDistance(TRIGGER_PIN, ECHO_PIN2);
+      distance_mm3 = measureDistance(TRIGGER_PIN, ECHO_PIN3);
+      distance_mm4 = measureDistance(TRIGGER_PIN, ECHO_PIN4);
+      if (distance_mm1 == 0 && distance_mm2 == 0 && distance_mm3 == 0 && distance_mm4 == 0){
+        state = RUN;
+      }
       break;
-    }
-    case DODGELEFT:
-    {
-      //angle droit
-      RightMotor->setSpeed(225); 
-      LeftMotor->setSpeed(225);
-      RightMotor->run(FORWARD); 
-      LeftMotor->run(BACKWARD);
-      delay(3800);
-      RightMotor->setSpeed(225); 
-      LeftMotor->setSpeed(225);
-      RightMotor->run(FORWARD); 
-      LeftMotor->run(FORWARD);
-      
-      // timeDodgeLeft += 1;
-      state = RUN;
-      break;
+
     }
     case END:
     {
