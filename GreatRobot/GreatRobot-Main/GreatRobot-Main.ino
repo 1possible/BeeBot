@@ -32,8 +32,11 @@ const int IR_left_PIN = 9;
 const int IR_right_PIN = 10;
 LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN);
 
+//starter switch (cordon)
+const int start_switch_PIN = 11;
 
-enum { WAIT, RUN, STEP_FORWARD, STEP_BACKWARD, DODGERIGHT, DODGELEFT, END} state; 
+
+enum { TEAM_CHOICE, WAIT, RUN, STEP_FORWARD, STEP_BACKWARD, DODGERIGHT, DODGELEFT, END} state; 
 
 unsigned long timeNow;
 unsigned long timeStartRUN;
@@ -80,13 +83,16 @@ void setup() {
   //IR MOTOR
   lineFollower.setup();
 
+  //starter_switch
+  pinMode(start_switch_PIN, INPUT_PULLUP);
+
   //sonor
   pinMode(TRIGGER_PIN, OUTPUT);
   digitalWrite(TRIGGER_PIN, LOW); // La broche TRIGGER doit être à LOW au repos
   pinMode(ECHO_PIN1, INPUT);
   
   //statemachine
-  state = WAIT;
+  state = TEAM_CHOICE;
 }
 
 void loop() {
@@ -97,7 +103,7 @@ void loop() {
   totalDistanceMotorFour += distanceMotorFour;
 
   switch(state){
-    case WAIT:
+    case TEAM_CHOICE:
     {
   	  String readString;
       String Q;
@@ -110,20 +116,29 @@ void loop() {
       //YELLOW TEAM
       if (Q == "1"){
         team = 1;
-        startRUN();
+        state = WAIT;
       }
       //BLUE TEAM
       else if (Q == "2"){
         team = 2;
+        state = WAIT;
+      }
+      break;
+    }
+    case WAIT :
+    {
+      if(digitalRead(start_switch_PIN)==HIGH){
         startRUN();
       }
       break;
+      
     }
     case RUN:
     {
       timeNow = millis()-timeStartRUN;
       distance_mm1 = measureDistance(TRIGGER_PIN, ECHO_PIN1);
       if(timeNow >= 120000){
+        Serial.println("chrono off");
         state = END;
       }
       else{
@@ -168,6 +183,7 @@ void loop() {
           if(endline){
             timeStartStep= millis();
             state = STEP_FORWARD;
+            //Serial.println("stat start forward");
           }
         }
         
@@ -176,9 +192,10 @@ void loop() {
     }
    case STEP_FORWARD:
    {
-      if(millis()-timeStartStep > 1000){
+      if(millis()-timeStartStep > 2000){
         timeStartStep= millis();
         state = STEP_BACKWARD;
+        //Serial.println("stat start backward");
       }else{
         RightMotor->setSpeed(225); 
         LeftMotor->setSpeed(225);
@@ -189,8 +206,9 @@ void loop() {
    }
    case STEP_BACKWARD:
    {
-      if(millis()-timeStartStep > 1000){
+      if(millis()-timeStartStep > 5000){
         timeStartStep= millis();
+        //Serial.println("stat start END");
         state = END;
       }else{
         RightMotor->setSpeed(225); 
@@ -236,7 +254,7 @@ void loop() {
     case END:
     {
       // Afficher les distances
-      Serial.print("Distance cycle Motor Two: ");
+      //Serial.print("Distance cycle Motor Two: ");
       Serial.print(distanceMotorTwo);
       Serial.println(" cm");
       Serial.print("Distance cycle Motor Four: ");
@@ -252,7 +270,7 @@ void loop() {
 
       RightMotor->run(RELEASE); 
       LeftMotor->run(RELEASE);
-      state = WAIT;
+      state = TEAM_CHOICE;
       //Serial.println("END");
       break;
     }
