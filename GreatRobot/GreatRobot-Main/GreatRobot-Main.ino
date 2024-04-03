@@ -6,17 +6,16 @@
 #include "SonarSensor.h"
 #include "EncoderLogic.h"
 #include "LineFollower.h"
+#include "Movement.h"
 
 // DEFINE PINS
-// Sonar sensor pins
-const byte TRIGGER_PIN = 7;
+const byte TRIGGER_PIN = 7;           // Sonar sensor pins
 const byte ECHO_PIN = 6;
-// Encoder
-const int encoR_PIN = 2;
+const int encoR_PIN = 2;              // Encoder
 const int encoL_PIN = 3;
-//IR sensor
-const int IR_left_PIN = 9;
+const int IR_left_PIN = 9;            // IR sensor
 const int IR_right_PIN = 10;
+
 
 // DEFINE INSTANCES FOR CLASSES
 CommunicationArduinoLCD communicationArduinoLCD;
@@ -25,45 +24,30 @@ SonarSensor sonar(TRIGGER_PIN, ECHO_PIN);
 EncoderLogic encoderLogic(encoR_PIN, encoL_PIN);
 LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN, motor);
 
+
 // DEFINE CONSTANTS
-// motor speeds
-const uint8_t LOW_SPEED = 75;
+const uint8_t LOW_SPEED = 75;                                 // motor speeds
 const uint8_t HIGH_SPEED = 250;
-// Lcd team
-int team = 1; // 1 YELLOW Team 2 BLUE
-// sonor sensor
-float distance_mm1 = 0.0; // pre declare variables for sensor captor (je pense pas que c'est nécessaire mais au cas zou)
-
-
-enum { WAIT, RUN, DODGERIGHT, DODGELEFT, END} state; 
-
+int team = 1;                                                 // Lcd team       // 1 YELLOW Team 2 BLUE
+int timeRight = 0;                                            // sonor sensor
+int timeDodgeRight = 0;
 unsigned long timeNow;
 unsigned long timeStartRUN;
 
 
-//// Capteur sonore
-int timeRight = 0;
-int timeDodgeRight = 0;
+enum { WAIT, RUN, DODGERIGHT, DODGELEFT, END} state; 
 
 
 void setup() {
-  // motor
-  motor.setupMotors();
-  // sonar sensor
-  sonar.setup();
-  //IR MOTOR
-  lineFollower.setup();
-
-  //serial (comm ard-lcd)
-  Serial.begin(9600);
-  //Serial.print("setup...");
-
-  //statemachine
-  state = WAIT;
+  motor.setupMotors();      // Motor
+  sonar.setup();            // Sonar sensor
+  lineFollower.setup();     // Line follower IR
+  Serial.begin(9600);       //serial (comm ard-lcd)
+  state = WAIT;             //statemachine
 }
 
-void loop() {
 
+void loop() {
   encoderLogic.update();
   
   switch(state){
@@ -75,14 +59,14 @@ void loop() {
     case RUN:
     {
       timeNow = millis()-timeStartRUN;
-      float distance_mm1 = sonar.measureDistance();
+      float distance_mm = sonar.measureDistance();
       if(timeNow >= 120000){
         state = END;
       }
       else{
         //capteur sonore
-        if (distance_mm1 != 0 && distance_mm1 < 100.0){
-          motor.controlMotors(0, 0, RELEASE, RELEASE);
+        if (distance_mm != 0 && distance_mm < 100.0){
+          Movement::stopMovement();
           timeRight = 80;
           timeDodgeRight = 3;
           Serial.println("tourne droite");
@@ -113,8 +97,8 @@ void loop() {
             }
             break;
           }
-        } // Capteur sonore fin
-        else{ // sinon continue de suivre la ligne
+        }
+        else{                                               // sinon continue de suivre la ligne
           bool endline =lineFollower.followingLine();
           if(endline){
             state = END;
@@ -126,28 +110,21 @@ void loop() {
     }
    case DODGERIGHT:
     {
-      //angle droit
-      motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, BACKWARD);
-      delay(3955);
-      motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
+      Movement::dodgeRight();
       // timeDodgeRight += 1;
       state = RUN;
       break;
     }
     case DODGELEFT:
     {
-      //angle droit
-      motor.controlMotors(HIGH_SPEED, HIGH_SPEED, BACKWARD, FORWARD);
-      delay(3800);
-      motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
-      
+      Movement::dodgeLeft();
       // timeDodgeLeft += 1;
       state = RUN;
       break;
     }
     case END:
     {
-      Serial.print("Distance cycle Motor Two: ");
+      Serial.print("Distance cycle Motor Two: ");                   // Encoder
       Serial.print(encoderLogic.getDistanceMotorTwo());
       Serial.println(" cm");
 
@@ -163,11 +140,11 @@ void loop() {
       Serial.print(encoderLogic.getTotalDistanceMotorFour());
       Serial.println(" cm");
 
-      delay(1000); // Adjust delay as needed
+      delay(1000);
 
-      motor.stopMotors();
+      Movement::stopMovement();
       state = WAIT;
-      //Serial.println("END");
+      // Serial.println("END");
       break;
     }
   }
