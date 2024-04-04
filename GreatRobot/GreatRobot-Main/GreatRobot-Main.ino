@@ -3,6 +3,7 @@
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 #include "LineFollower.h"
+#include "Strategy.h"
 
 //motor
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
@@ -58,6 +59,9 @@ const unsigned long MEASURE_TIMEOUT = 22000UL;
 const float SOUND_SPEED = 340.0 / 1000;
 int timeRight = 0;
 int timeDodgeRight = 0;
+
+//Strategy
+Strategy strategy = Strategy(&lineFollower);
 
 int measureDistance (const byte x, const byte y)
 {
@@ -152,11 +156,6 @@ void loop() {
       distance_mm2 = measureDistance(TRIGGER_PIN, ECHO_PIN2);
       distance_mm3 = measureDistance(TRIGGER_PIN, ECHO_PIN3);
       distance_mm4 = measureDistance(TRIGGER_PIN, ECHO_PIN4);
-      if(timeNow >= 120000){
-        Serial.println("chrono off");
-        state = END;
-      }
-      else{
         if (distance_mm1 != 0 && distance_mm1 < 100.0){
           RightMotor->setSpeed(0); 
           LeftMotor->setSpeed(0);
@@ -191,45 +190,10 @@ void loop() {
         }
         
         else{
-          bool endline =lineFollower.followingLine(LeftMotor,RightMotor);
-          if(endline){
-            timeStartStep= millis();
-            state = STEP_FORWARD;
-            //Serial.println("stat start forward");
-          }
+          strategy.play(LeftMotor,RightMotor);
         }
-        
-      }
       break;
     }
-   case STEP_FORWARD:
-   {
-      if(millis()-timeStartStep > 2000){
-        timeStartStep= millis();
-        state = STEP_BACKWARD;
-        //Serial.println("stat start backward");
-      }else{
-        RightMotor->setSpeed(225); 
-        LeftMotor->setSpeed(225);
-        RightMotor->run(FORWARD); 
-        LeftMotor->run(FORWARD);
-      }
-      break;
-   }
-   case STEP_BACKWARD:
-   {
-      if(millis()-timeStartStep > 5000){
-        timeStartStep= millis();
-        //Serial.println("stat start END");
-        state = END;
-      }else{
-        RightMotor->setSpeed(225); 
-        LeftMotor->setSpeed(225);
-        RightMotor->run(BACKWARD); 
-        LeftMotor->run(BACKWARD);
-      }
-      break;
-   }
     case HOMOLOGATION:
     {
       distance_mm1 = measureDistance(TRIGGER_PIN, ECHO_PIN1);
