@@ -5,11 +5,7 @@
 class CommunicationArduinoLCD {
   public:
   CommunicationArduinoLCD(); 
-  void chooseTeam();
+  int chooseTeam();
 };
-
-// Declare the startRUN() function
-extern void startRUN();
-extern int team;
 
 #endif

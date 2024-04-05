@@ -30,9 +30,9 @@ private:
   // Debuging Identifier
   //String debugIdentifier = "[SAMPLE MANAGER] | ";
   //Function
-  void rotation(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor);
-  void moveForward(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor);
-  void followingLine_RUN(bool detectionLeft,bool detectionRigth,Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor);
+  void rotation();
+  void moveForward();
+  void followingLine_RUN(bool detectionLeft,bool detectionRigth);
 };
 
 

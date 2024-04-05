@@ -2,9 +2,10 @@
 CommunicationArduinoLCD::CommunicationArduinoLCD(){
 }
 // CommunicationArduinoLCD
-void CommunicationArduinoLCD::chooseTeam(){
+int CommunicationArduinoLCD::chooseTeam(){
   String readString;
   String Q;
+  int team = 0;
   //delay(1);
   if(Serial.available() > 0){
     char c = Serial.read();
@@ -14,11 +15,10 @@ void CommunicationArduinoLCD::chooseTeam(){
   //YELLOW TEAM
   if (Q == "1"){
     team = 1;
-    startRUN();
   }
   //BLUE TEAM
   else if (Q == "2"){
     team = 2;
-    startRUN();
   }
+  return team;
 }

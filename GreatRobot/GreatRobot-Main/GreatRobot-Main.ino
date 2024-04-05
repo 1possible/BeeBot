@@ -25,7 +25,7 @@ const byte ECHO_PIN4 = 4;
 // DEFINE INSTANCES FOR CLASSES
 CommunicationArduinoLCD communicationArduinoLCD;
 Motor motor;
-SonarSensor sonar(TRIGGER_PIN, ECHO_PIN);
+SonarSensor sonar(TRIGGER_PIN, ECHO_PIN1);
 EncoderLogic encoderLogic(encoR_PIN, encoL_PIN);
 LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN, motor);
 //Strategy
@@ -103,7 +103,11 @@ void loop() {
   switch(state){
     case TEAM_CHOICE:
     {
-      communicationArduinoLCD.chooseTeam();
+      team = communicationArduinoLCD.chooseTeam();
+      if (team !== 0){
+        state = WAIT;
+        strategy.setTeam(team);
+      }
       break;
     }
     case WAIT :
@@ -142,7 +146,7 @@ void loop() {
           state = HOMOLOGATION;
           break;
         }else{
-          strategy.play(LeftMotor,RightMotor);
+          strategy.play();
         }
       break;
     }
@@ -187,10 +191,3 @@ void loop() {
   }
   delay(50);
 }
-void startRUN(){
-  state = RUN;
-  //Serial.println("RUN");
-  strategy.setTeam(team);
-  timeStartRUN = millis();
-}
-

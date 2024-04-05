@@ -39,7 +39,7 @@ bool LineFollower::followingLine(){
   switch(state_line){
     case RUN:
     {
-      followingLine_RUN(detectionLeft,detectionRigth,LeftMotor,RightMotor);
+      followingLine_RUN(detectionLeft,detectionRigth);
       break;
     }
     case DOUBLE_DETECT:
@@ -53,7 +53,7 @@ bool LineFollower::followingLine(){
       }
       else
       {
-        moveForward(LeftMotor,RightMotor);
+        moveForward();
       }
       break;
     }
@@ -63,7 +63,7 @@ bool LineFollower::followingLine(){
       {
         state_line = RETURN_TO_LINE_2;
       }
-      rotation(LeftMotor, RightMotor);
+      rotation();
       break;
     }
     case RETURN_TO_LINE_2:
@@ -74,7 +74,7 @@ bool LineFollower::followingLine(){
       }
       else
       {
-        rotation(LeftMotor, RightMotor);
+        rotation();
       }
       break;
     }
@@ -87,18 +87,18 @@ bool LineFollower::followingLine(){
   }
   return endLine;
 }
-void LineFollower::followingLine_RUN(bool detectionLeft,bool detectionRigth,Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor){
+void LineFollower::followingLine_RUN(bool detectionLeft,bool detectionRigth){
   if(detectionLeft == HIGH and detectionRigth == HIGH){
     timeLineLength =millis();
     state_line = DOUBLE_DETECT;
-    moveForward(LeftMotor,RightMotor);
+    moveForward();
   }
   else if( (detect_main_Right and detectionRigth == HIGH) or (!detect_main_Right and detectionLeft == HIGH))
   {
-    rotation(LeftMotor, RightMotor);
+    rotation();
   }
   else{
-    moveForward(LeftMotor,RightMotor);
+    moveForward();
   }
 
 }
@@ -117,6 +117,6 @@ void LineFollower::rotation(){
     motor.controlMotors(HIGH_SPEED, HIGH_SPEED, BACKWARD, FORWARD);
   }
 }
-void LineFollower::moveForward(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor){
+void LineFollower::moveForward(){
     motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
 }
