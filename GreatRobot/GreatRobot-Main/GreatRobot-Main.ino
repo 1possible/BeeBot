@@ -40,7 +40,7 @@ LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN);
 const int start_switch_PIN = 11;
 
 
-enum { TEAM_CHOICE, WAIT, RUN, STEP_FORWARD, STEP_BACKWARD, HOMOLOGATION, DODGERIGHT, DODGELEFT, END} state; 
+enum { TEAM_CHOICE, WAIT, RUN, HOMOLOGATION, END} state; 
 
 unsigned long timeNow;
 unsigned long timeStartRUN;
@@ -235,7 +235,7 @@ void loop() {
 void startRUN(){
   state = RUN;
   //Serial.println("RUN");
-  lineFollower.setTeam(team);
+  strategy.setTeam(team);
   timeStartRUN = millis();
 }
 
