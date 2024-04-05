@@ -7,14 +7,19 @@
 #include "EncoderLogic.h"
 #include "LineFollower.h"
 #include "Movement.h"
+#include "Strategy.h"
 
 // DEFINE PINS
-const byte TRIGGER_PIN = 7;           // Sonar sensor pins
-const byte ECHO_PIN = 6;
 const int encoR_PIN = 2;              // Encoder
 const int encoL_PIN = 3;
 const int IR_left_PIN = 9;            // IR sensor
 const int IR_right_PIN = 10;
+//pin sonor sensor
+const byte TRIGGER_PIN = 8; 
+const byte ECHO_PIN1 = 7;
+const byte ECHO_PIN2 = 6;  
+const byte ECHO_PIN3 = 5;
+const byte ECHO_PIN4 = 4;  
 
 
 // DEFINE INSTANCES FOR CLASSES
@@ -23,6 +28,9 @@ Motor motor;
 SonarSensor sonar(TRIGGER_PIN, ECHO_PIN);
 EncoderLogic encoderLogic(encoR_PIN, encoL_PIN);
 LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN, motor);
+//Strategy
+Strategy strategy = Strategy(&lineFollower);
+
 
 
 // DEFINE CONSTANTS
@@ -34,8 +42,34 @@ int timeDodgeRight = 0;
 unsigned long timeNow;
 unsigned long timeStartRUN;
 
+//sonor sensor constant
+float distance_mm1 = 0.0;
+float distance_mm2 = 0.0;
+float distance_mm3 = 0.0;
+float distance_mm4 = 0.0;
+const unsigned long MEASURE_TIMEOUT = 22000UL;
+const float SOUND_SPEED = 340.0 / 1000;
+int timeRight = 0;
+int timeDodgeRight = 0;
 
-enum { WAIT, RUN, DODGERIGHT, DODGELEFT, END} state; 
+//starter switch (cordon)
+const int start_switch_PIN = 11;
+
+
+enum { TEAM_CHOICE, WAIT, RUN, HOMOLOGATION, END} state; 
+
+int measureDistance (const byte x, const byte y)
+{
+  /* 1. Lance une mesure de distance en envoyant une impulsion HIGH de 10µs sur la broche TRIGGER */
+  digitalWrite(x, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(x, LOW);
+  /* 2. Mesure le temps entre l'envoi de l'impulsion ultrasonique et son écho (si il existe) */
+  unsigned long measure = pulseIn(y, HIGH, MEASURE_TIMEOUT);
+  /* 3. Calcul la distance à partir du temps mesuré */
+  int test = measure / 2.0 * SOUND_SPEED; 
+  return test;
+}
 
 
 void setup() {
@@ -43,7 +77,23 @@ void setup() {
   sonar.setup();            // Sonar sensor
   lineFollower.setup();     // Line follower IR
   Serial.begin(9600);       //serial (comm ard-lcd)
-  state = WAIT;             //statemachine
+  state = TEAM_CHOICE;             //statemachine
+
+
+  //starter_switch
+  pinMode(start_switch_PIN, INPUT_PULLUP);
+  /*
+  //sonor
+  pinMode(TRIGGER_PIN, OUTPUT);
+  digitalWrite(TRIGGER_PIN, LOW); // La broche TRIGGER doit être à LOW au repos
+  pinMode(ECHO_PIN1, INPUT);
+  // Initialise les broches 
+  pinMode(ECHO_PIN2, INPUT);
+  // Initialise les broches 
+  pinMode(ECHO_PIN3, INPUT);
+  // Initialise les broches 
+  pinMode(ECHO_PIN4, INPUT);
+  */
 }
 
 
@@ -51,79 +101,65 @@ void loop() {
   encoderLogic.update();
   
   switch(state){
-    case WAIT:
+    case TEAM_CHOICE:
     {
       communicationArduinoLCD.chooseTeam();
       break;
     }
+    case WAIT :
+    {
+      if(digitalRead(start_switch_PIN)==HIGH){
+        state = RUN;
+      }
+      break;
+      
+    }
     case RUN:
     {
       timeNow = millis()-timeStartRUN;
-      float distance_mm = sonar.measureDistance();
-      if(timeNow >= 120000){
-        state = END;
-      }
-      else{
-        //capteur sonore
-        if (distance_mm != 0 && distance_mm < 100.0){
+      //float distance_mm = sonar.measureDistance();
+      distance_mm1 = measureDistance(TRIGGER_PIN, ECHO_PIN1);
+      distance_mm2 = measureDistance(TRIGGER_PIN, ECHO_PIN2);
+      distance_mm3 = measureDistance(TRIGGER_PIN, ECHO_PIN3);
+      distance_mm4 = measureDistance(TRIGGER_PIN, ECHO_PIN4);
+        if (distance_mm1 != 0 && distance_mm1 < 100.0){
           Movement::stopMovement();
-          timeRight = 80;
-          timeDodgeRight = 3;
-          Serial.println("tourne droite");
-          state = DODGERIGHT;
+          state = HOMOLOGATION;
           break;
         }
-        if (timeDodgeRight > 0){
-          //tour par la droite
-          if (timeRight > 1) {
-            Serial.println("timeRight");
-            Serial.println(timeRight);
-            timeRight--;
-            break;
-          }
-          else if (timeRight == 1){
-            timeRight--;
-            if (timeDodgeRight > 1){
-              timeDodgeRight--;
-              timeRight = 80;
-              state = DODGELEFT;
-              break;
-            }
-            else if (timeDodgeRight == 1){
-              timeDodgeRight--;
-              timeRight = 80;
-              state = DODGERIGHT;
-              break;
-            }
-            break;
-          }
+        else if (distance_mm2 != 0 && distance_mm2 < 100.0){
+          Movement::stopMovement();
+          state = HOMOLOGATION;
+          break;
         }
-        else{                                               // sinon continue de suivre la ligne
-          bool endline =lineFollower.followingLine();
-          if(endline){
-            state = END;
-          }
+        else if (distance_mm3 != 0 && distance_mm3 < 100.0){
+          Movement::stopMovement();
+          state = HOMOLOGATION;
+          break;
         }
-        
+        else if (distance_mm4 != 0 && distance_mm4 < 100.0){
+          Movement::stopMovement();
+          state = HOMOLOGATION;
+          break;
+        }else{
+          strategy.play(LeftMotor,RightMotor);
+        }
+      break;
+    }
+    case HOMOLOGATION:
+    {
+      distance_mm1 = measureDistance(TRIGGER_PIN, ECHO_PIN1);
+      distance_mm2 = measureDistance(TRIGGER_PIN, ECHO_PIN2);
+      distance_mm3 = measureDistance(TRIGGER_PIN, ECHO_PIN3);
+      distance_mm4 = measureDistance(TRIGGER_PIN, ECHO_PIN4);
+      if ((distance_mm1 == 0 || distance_mm1 > 100) && (distance_mm2 == 0 || distance_mm2 > 100) && (distance_mm3 == 0 || distance_mm3 > 100) && (distance_mm4 == 0 || distance_mm4 > 100)){
+        state = RUN;
       }
-      break;
-    }
-   case DODGERIGHT:
-    {
-      Movement::dodgeRight();
-      // timeDodgeRight += 1;
-      state = RUN;
-      break;
-    }
-    case DODGELEFT:
-    {
-      Movement::dodgeLeft();
-      // timeDodgeLeft += 1;
-      state = RUN;
       break;
     }
     case END:
     {
+    /*
       Serial.print("Distance cycle Motor Two: ");                   // Encoder
       Serial.print(encoderLogic.getDistanceMotorTwo());
       Serial.println(" cm");
@@ -141,9 +177,10 @@ void loop() {
       Serial.println(" cm");
 
       delay(1000);
+      */
 
       Movement::stopMovement();
-      state = WAIT;
+      state = TEAM_CHOICE;
       // Serial.println("END");
       break;
     }
@@ -153,5 +190,7 @@ void loop() {
 void startRUN(){
   state = RUN;
   //Serial.println("RUN");
+  strategy.setTeam(team);
   timeStartRUN = millis();
 }
+
