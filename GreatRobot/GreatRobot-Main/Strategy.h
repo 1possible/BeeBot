@@ -4,7 +4,7 @@
 #include "LineFollower.h"
 // MARK: Libraries
 //#include <Arduino.h>
-#include <Adafruit_MotorShield.h>
+// #include <Adafruit_MotorShield.h>
 class Strategy{
   public:
     Strategy(LineFollower *lineFollower);
@@ -17,6 +17,7 @@ class Strategy{
     unsigned long timeStartSTRAT;
     unsigned long timeStartStep;
     bool teamYellow;
+    static Motor motor; 
 };
 
 #endif
