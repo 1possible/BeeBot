@@ -14,84 +14,52 @@ const int encoR_PIN = 2;              // Encoder
 const int encoL_PIN = 3;
 const int IR_left_PIN = 9;            // IR sensor
 const int IR_right_PIN = 10;
-//pin sonor sensor
-const byte TRIGGER_PIN = 8; 
-const byte ECHO_PIN1 = 7;
-const byte ECHO_PIN2 = 6;  
-const byte ECHO_PIN3 = 5;
-const byte ECHO_PIN4 = 4;  
+const byte TRIGGER_PIN = 8;           // Pin sonor sensor
+const byte ECHO_PIN_1 = 7;
+const byte ECHO_PIN_2 = 6;  
+const byte ECHO_PIN_3 = 5;
+const byte ECHO_PIN_4 = 4;  
+const int start_switch_PIN = 11;      // Starter switch (cordon)
 
 
 // DEFINE INSTANCES FOR CLASSES
 CommunicationArduinoLCD communicationArduinoLCD;
 Motor motor;
-SonarSensor sonar(TRIGGER_PIN, ECHO_PIN1);
 EncoderLogic encoderLogic(encoR_PIN, encoL_PIN);
 LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN, motor);
-//Strategy
 Strategy strategy = Strategy(&lineFollower);
-
+SonarSensor sonarSensor1(TRIGGER_PIN, ECHO_PIN_1);
+SonarSensor sonarSensor2(TRIGGER_PIN, ECHO_PIN_2);
+SonarSensor sonarSensor3(TRIGGER_PIN, ECHO_PIN_3);
+SonarSensor sonarSensor4(TRIGGER_PIN, ECHO_PIN_4);
 
 
 // DEFINE CONSTANTS
 const uint8_t LOW_SPEED = 75;                                 // motor speeds
 const uint8_t HIGH_SPEED = 250;
 int team = 1;                                                 // Lcd team       // 1 YELLOW Team 2 BLUE
-int timeRight = 0;                                            // sonor sensor
-int timeDodgeRight = 0;
 unsigned long timeNow;
 unsigned long timeStartRUN;
+float distance1 = 0.0;                                        // Sonar sensor
+float distance2 = 0.0;
+float distance3 = 0.0;
+float distance4 = 0.0;
 
-//sonor sensor constant
-float distance_mm1 = 0.0;
-float distance_mm2 = 0.0;
-float distance_mm3 = 0.0;
-float distance_mm4 = 0.0;
-const unsigned long MEASURE_TIMEOUT = 22000UL;
-const float SOUND_SPEED = 340.0 / 1000;
-
-//starter switch (cordon)
-const int start_switch_PIN = 11;
 
 
 enum { TEAM_CHOICE, WAIT, RUN, HOMOLOGATION, END} state; 
 
-int measureDistance (const byte x, const byte y)
-{
-  /* 1. Lance une mesure de distance en envoyant une impulsion HIGH de 10µs sur la broche TRIGGER */
-  digitalWrite(x, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(x, LOW);
-  /* 2. Mesure le temps entre l'envoi de l'impulsion ultrasonique et son écho (si il existe) */
-  unsigned long measure = pulseIn(y, HIGH, MEASURE_TIMEOUT);
-  /* 3. Calcul la distance à partir du temps mesuré */
-  int test = measure / 2.0 * SOUND_SPEED; 
-  return test;
-}
-
 
 void setup() {
-  motor.setupMotors();      // Motor
-  sonar.setup();            // Sonar sensor
-  lineFollower.setup();     // Line follower IR
-  Serial.begin(9600);       //serial (comm ard-lcd)
-  state = TEAM_CHOICE;             //statemachine
-
-
-  //starter_switch
-  pinMode(start_switch_PIN, INPUT_PULLUP);
-  /*
-  //sonor
-  pinMode(TRIGGER_PIN, OUTPUT);
-  digitalWrite(TRIGGER_PIN, LOW); // La broche TRIGGER doit être à LOW au repos
-  pinMode(ECHO_PIN1, INPUT);
-  // Initialise les broches 
-  pinMode(ECHO_PIN2, INPUT);
-  // Initialise les broches 
-  pinMode(ECHO_PIN3, INPUT);
-  // Initialise les broches 
-  pinMode(ECHO_PIN4, INPUT);
-  */
+  motor.setupMotors();                        // Motor    
+  lineFollower.setup();                       // Line follower IR
+  Serial.begin(9600);                         // Serial (comm ard-lcd)
+  state = TEAM_CHOICE;                        // Statemachine
+  pinMode(start_switch_PIN, INPUT_PULLUP);    // Starter_switch
+  sonarSensor1.setup();                       // Sonar sensor
+  sonarSensor2.setup();
+  sonarSensor3.setup();
+  sonarSensor4.setup();
 }
 
 
@@ -119,25 +87,24 @@ void loop() {
     case RUN:
     {
       timeNow = millis()-timeStartRUN;
-      //float distance_mm = sonar.measureDistance();
-      distance_mm1 = measureDistance(TRIGGER_PIN, ECHO_PIN1);
-      distance_mm2 = measureDistance(TRIGGER_PIN, ECHO_PIN2);
-      distance_mm3 = measureDistance(TRIGGER_PIN, ECHO_PIN3);
-      distance_mm4 = measureDistance(TRIGGER_PIN, ECHO_PIN4);
-        if (distance_mm1 != 0 && distance_mm1 < 100.0){
+      distance1 = sonarSensor1.measureDistance();
+      distance2 = sonarSensor2.measureDistance();
+      distance3 = sonarSensor3.measureDistance();
+      distance4 = sonarSensor4.measureDistance();
+        if (distance1 != 0 && distance1 < 100.0){
           Movement::stopMovement();
           state = HOMOLOGATION;
         }
-        else if (distance_mm2 != 0 && distance_mm2 < 100.0){
+        else if (distance2 != 0 && distance2 < 100.0){
           Movement::stopMovement();
           state = HOMOLOGATION;
           break;
         }
-        else if (distance_mm3 != 0 && distance_mm3 < 100.0){
+        else if (distance3 != 0 && distance3 < 100.0){
           Movement::stopMovement();
           state = HOMOLOGATION;
         }
-        else if (distance_mm4 != 0 && distance_mm4 < 100.0){
+        else if (distance4 != 0 && distance4 < 100.0){
           Movement::stopMovement();
           state = HOMOLOGATION;
         }else{
@@ -147,11 +114,11 @@ void loop() {
     }
     case HOMOLOGATION:
     {
-      distance_mm1 = measureDistance(TRIGGER_PIN, ECHO_PIN1);
-      distance_mm2 = measureDistance(TRIGGER_PIN, ECHO_PIN2);
-      distance_mm3 = measureDistance(TRIGGER_PIN, ECHO_PIN3);
-      distance_mm4 = measureDistance(TRIGGER_PIN, ECHO_PIN4);
-      if ((distance_mm1 == 0 || distance_mm1 > 100) && (distance_mm2 == 0 || distance_mm2 > 100) && (distance_mm3 == 0 || distance_mm3 > 100) && (distance_mm4 == 0 || distance_mm4 > 100)){
+      distance1 = sonarSensor1.measureDistance();
+      distance2 = sonarSensor2.measureDistance();
+      distance3 = sonarSensor3.measureDistance();
+      distance4 = sonarSensor4.measureDistance();
+      if ((distance1 == 0 || distance1 > 100) && (distance2 == 0 || distance2 > 100) && (distance3 == 0 || distance3 > 100) && (distance4 == 0 || distance4 > 100)){
         state = RUN;
       }
       break;
