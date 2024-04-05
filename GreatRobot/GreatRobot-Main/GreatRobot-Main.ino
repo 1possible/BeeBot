@@ -129,7 +129,6 @@ void loop() {
         if (distance_mm1 != 0 && distance_mm1 < 100.0){
           Movement::stopMovement();
           state = HOMOLOGATION;
-          break;
         }
         else if (distance_mm2 != 0 && distance_mm2 < 100.0){
           Movement::stopMovement();
@@ -139,12 +138,10 @@ void loop() {
         else if (distance_mm3 != 0 && distance_mm3 < 100.0){
           Movement::stopMovement();
           state = HOMOLOGATION;
-          break;
         }
         else if (distance_mm4 != 0 && distance_mm4 < 100.0){
           Movement::stopMovement();
           state = HOMOLOGATION;
-          break;
         }else{
           strategy.play();
         }
