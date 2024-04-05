@@ -1,6 +1,6 @@
 #ifndef STRATEGY_H
 #define STRATEGY_H
-
+#include "Motor.h"
 #include "LineFollower.h"
 // MARK: Libraries
 //#include <Arduino.h>
@@ -8,7 +8,7 @@
 class Strategy{
   public:
     Strategy(LineFollower *lineFollower);
-    void play(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor);
+    void play();
     void Strategy::setTeam(int newTeam);
   private:
     LineFollower* lineFollower;

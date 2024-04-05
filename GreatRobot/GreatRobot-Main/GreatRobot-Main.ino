@@ -49,8 +49,6 @@ float distance_mm3 = 0.0;
 float distance_mm4 = 0.0;
 const unsigned long MEASURE_TIMEOUT = 22000UL;
 const float SOUND_SPEED = 340.0 / 1000;
-int timeRight = 0;
-int timeDodgeRight = 0;
 
 //starter switch (cordon)
 const int start_switch_PIN = 11;
@@ -104,7 +102,7 @@ void loop() {
     case TEAM_CHOICE:
     {
       team = communicationArduinoLCD.chooseTeam();
-      if (team !== 0){
+      if (team != 0){
         state = WAIT;
         strategy.setTeam(team);
       }

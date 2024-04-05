@@ -18,7 +18,7 @@ void Strategy::setTeam(int newTeam){
     lineFollower->setTeam(2);
    }
 }
-void Strategy::play(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor)
+void Strategy::play()
 {
   if(strat_state != START && millis()-timeStartSTRAT>= LimitTime){
     strat_state = END; 
@@ -31,7 +31,7 @@ void Strategy::play(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor)
     }
     case FOLLOW_LINE:
     {
-      bool endline =lineFollower->followingLine(LeftMotor,RightMotor);
+      bool endline =lineFollower->followingLine();
       if(endline){
         timeStartStep= millis();
         strat_state = STEP_FORWARD;
@@ -45,10 +45,7 @@ void Strategy::play(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor)
         strat_state = STEP_ROT;
         //Serial.println("stat start backward");
       }else{
-        RightMotor->setSpeed(225); 
-        LeftMotor->setSpeed(225);
-        RightMotor->run(FORWARD); 
-        LeftMotor->run(FORWARD);
+        motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
       }
       break;
     }
@@ -59,15 +56,9 @@ void Strategy::play(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor)
         strat_state = RETURN_TO_BASE;
       }else{
         if(teamYellow){ 
-          RightMotor->setSpeed(225); 
-          LeftMotor->setSpeed(225);
-          RightMotor->run(FORWARD); 
-          LeftMotor->run(BACKWARD);
+          motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, BACKWARD);
         }else{
-          RightMotor->setSpeed(225); 
-          LeftMotor->setSpeed(225);
-          RightMotor->run(BACKWARD); 
-          LeftMotor->run(FORWARD);
+          motor.controlMotors(HIGH_SPEED, HIGH_SPEED, BACKWARD, FORWARD);
         }
       }
       break;
@@ -78,19 +69,13 @@ void Strategy::play(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor)
         timeStartStep= millis();
         strat_state = END;
       }else{
-        RightMotor->setSpeed(225); 
-        LeftMotor->setSpeed(225);
-        RightMotor->run(BACKWARD); 
-        LeftMotor->run(BACKWARD);
+        motor.controlMotors(HIGH_SPEED, HIGH_SPEED, BACKWARD, BACKWARD);
       }
       break;
     }
     case END:
     {
-      RightMotor->run(RELEASE); 
-      LeftMotor->run(RELEASE);
-      RightMotor->setSpeed(0); 
-      LeftMotor->setSpeed(0);
+      motor.stopMotors();
       break;
     }
   }
