@@ -6,7 +6,7 @@
 * [About the project](#question-about-the-project)
 * [Getting started](#rocket-getting-started)
     * [Frameworks](#zap-frameworks)
-    * [Class diagram](#class-diagram)
+    * [Class diagram](#seedling-class-diagram)
 ## **Project participants**
 
 ### 2023-24
@@ -29,6 +29,6 @@ The purpose of this project is create a robot that will be able to rotate the so
 For the TFT LCD
 - MCUFRIEND_kbv
 
-### class diagram
+### :seedling: class diagram
 
 ![class_diagram](assets/images/diagram_class.png)
