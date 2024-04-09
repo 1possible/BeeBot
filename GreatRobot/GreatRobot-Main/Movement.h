@@ -10,6 +10,10 @@ public:
   static void dodgeRight();
   static void dodgeLeft();
   static void stopMovement();
+  static void turnRight();
+  static void turnLeft();
+  static void forward();
+  static void backward();
 };
 
 #endif

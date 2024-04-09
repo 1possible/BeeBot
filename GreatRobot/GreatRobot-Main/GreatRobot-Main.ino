@@ -26,7 +26,7 @@ const int start_switch_PIN = 11;      // Starter switch (cordon)
 CommunicationArduinoLCD communicationArduinoLCD;
 Motor motor;
 EncoderLogic encoderLogic(encoR_PIN, encoL_PIN);
-LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN, motor);
+LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN);
 Strategy strategy = Strategy(&lineFollower);
 SonarSensor sonarSensor1(TRIGGER_PIN, ECHO_PIN_1);
 SonarSensor sonarSensor2(TRIGGER_PIN, ECHO_PIN_2);
@@ -91,23 +91,11 @@ void loop() {
       distance2 = sonarSensor2.measureDistance();
       distance3 = sonarSensor3.measureDistance();
       distance4 = sonarSensor4.measureDistance();
-        if (distance1 != 0 && distance1 < 100.0){
+        if ((distance1 != 0 && distance1 < 100.0) || (distance2 != 0 && distance2 < 100.0)|| (distance3 != 0 && distance3 < 100.0) || (distance4 != 0 && distance4 < 100.0)) {
           Movement::stopMovement();
           state = HOMOLOGATION;
         }
-        else if (distance2 != 0 && distance2 < 100.0){
-          Movement::stopMovement();
-          state = HOMOLOGATION;
-          break;
-        }
-        else if (distance3 != 0 && distance3 < 100.0){
-          Movement::stopMovement();
-          state = HOMOLOGATION;
-        }
-        else if (distance4 != 0 && distance4 < 100.0){
-          Movement::stopMovement();
-          state = HOMOLOGATION;
-        }else{
+        else{
           strategy.play();
         }
       break;

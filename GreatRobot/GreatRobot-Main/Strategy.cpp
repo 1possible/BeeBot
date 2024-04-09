@@ -45,7 +45,7 @@ void Strategy::play()
         strat_state = STEP_ROT;
         //Serial.println("stat start backward");
       }else{
-        motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
+        Movement::forward();
       }
       break;
     }
@@ -56,9 +56,9 @@ void Strategy::play()
         strat_state = RETURN_TO_BASE;
       }else{
         if(teamYellow){ 
-          motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, BACKWARD);
+          Movement::turnRight();
         }else{
-          motor.controlMotors(HIGH_SPEED, HIGH_SPEED, BACKWARD, FORWARD);
+          Movement::turnLeft();
         }
       }
       break;
@@ -69,13 +69,13 @@ void Strategy::play()
         timeStartStep= millis();
         strat_state = END;
       }else{
-        motor.controlMotors(HIGH_SPEED, HIGH_SPEED, BACKWARD, BACKWARD);
+        Movement::backward();
       }
       break;
     }
     case END:
     {
-      motor.stopMotors();
+      Movement::stopMovement();
       break;
     }
   }
