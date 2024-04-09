@@ -12,7 +12,7 @@ Motor::Motor(){
 void Motor::setupMotors() {
   AFMS.begin();
   RightMotor = AFMS.getMotor(2);
-  LeftMotor = AFMS.getMotor(3);
+  LeftMotor = AFMS.getMotor(1);
 }
 
 // Function to control the motors
