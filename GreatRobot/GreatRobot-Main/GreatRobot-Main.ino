@@ -68,14 +68,14 @@ void setup() {
   Serial.begin(9600);                         // Serial (comm ard-lcd)
   state = TEAM_CHOICE;                        // Statemachine
   pinMode(start_switch_PIN, INPUT_PULLUP);    // Starter_switch
-  sonarSensorN.setup(100);                       // Sonar sensor
-  sonarSensorW.setup(100);
-  sonarSensorE.setup(100);
-  sonarSensorS.setup(100);
-  sonarSensorNW.setup(250);
-  sonarSensorNE.setup(250);
-  sonarSensorSW.setup(250);
-  sonarSensorSE.setup(250);
+  sonarSensorN.setup(150);                       // Sonar sensor
+  sonarSensorW.setup(150);
+  sonarSensorE.setup(150);
+  sonarSensorS.setup(150);
+  sonarSensorNW.setup(150);
+  sonarSensorNE.setup(150);
+  sonarSensorSW.setup(150);
+  sonarSensorSE.setup(150);
 }
 
 
