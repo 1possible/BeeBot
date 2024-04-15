@@ -4,6 +4,8 @@
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
 Adafruit_DCMotor *RightMotor;
 Adafruit_DCMotor *LeftMotor;
+Adafruit_DCMotor *TriggerArmMotor;
+Adafruit_DCMotor *TurnSolarPanelMotor;
 
 Motor::Motor(){
 }
@@ -13,6 +15,8 @@ void Motor::setupMotors() {
   AFMS.begin();
   RightMotor = AFMS.getMotor(2);
   LeftMotor = AFMS.getMotor(1);
+  TriggerArmMotor = AFMS.getMotor(3);
+  TurnSolarPanelMotor = AFMS.getMotor(4);
 }
 
 // Function to control the motors
@@ -30,3 +34,18 @@ void Motor::stopMotors() {
   RightMotor->setSpeed(0);
   RightMotor->run(RELEASE);
 }
+
+void Motor::openSolarPanelArm() {
+  TriggerArmMotor->setSpeed(250); 
+  TriggerArmMotor->run(FORWARD);
+  delay(2000);
+  TriggerArmMotor->run(RELEASE);
+}
+
+void Motor::turnSolarPanel() {
+  TurnSolarPanelMotor->setSpeed(250); 
+  TurnSolarPanelMotor->run(FORWARD);
+  delay(2000);
+  TurnSolarPanelMotor->run(RELEASE);
+}
+

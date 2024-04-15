@@ -23,6 +23,7 @@ const int ECHO_PIN_5 = 48;
 const int ECHO_PIN_6 = 49; 
 const int ECHO_PIN_7 = 50; 
 const int ECHO_PIN_8 = 51; 
+const int ECHO_PIN_9 = 43;            // Pin du capteur ultrason qui détecte les panneaux solaires
 const int start_switch_PIN = 11;      // Starter switch (cordon)
 
 

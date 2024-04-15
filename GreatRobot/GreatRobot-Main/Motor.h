@@ -16,6 +16,8 @@ class Motor {
     void setupMotors();
     void controlMotors(uint8_t leftSpeed, uint8_t rightSpeed, uint8_t leftDirection, uint8_t rightDirection);
     void stopMotors();
+    void openSolarPanelArm();
+    void turnSolarPanel();
 };
 
 extern int team;

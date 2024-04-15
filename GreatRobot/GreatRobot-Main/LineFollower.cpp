@@ -89,7 +89,7 @@ bool LineFollower::followingLine(){
 }
 void LineFollower::followingLine_RUN(bool detectionLeft,bool detectionRigth){
   if(detectionLeft == HIGH and detectionRigth == HIGH){
-    timeLineLength =millis();
+    timeLineLength = millis();
     state_line = DOUBLE_DETECT;
     Movement::forward();
   }

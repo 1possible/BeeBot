@@ -1,12 +1,22 @@
 #ifndef SolarPanels_H
 #define SolarPanels_H
-#include <Arduino.h>
-#include <Adafruit_MotorShield.h>
-#include "utility/Adafruit_MS_PWMServoDriver.h"
+
+#include "Motor.h"
+#include "Movement.h"
+#include "SonarSensor.h"
 
 class SolarPanels {
+  private:
+    SonarSensor sonarSensor;
+    static Motor motor;
+
   public:
-    SolarPanels(); 
+    SolarPanels();
     void setupSolarPanels();
+    void play();
 };
+
+extern int ECHO_PIN_9;
+extern int TRIGGER_PIN;
+
 #endif
