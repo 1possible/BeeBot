@@ -38,7 +38,6 @@ int LCDscreen::chooseTeamScreen(){
 int LCDscreen::choosePlantsScreen(){
   int val = -1;
   if(stateScreen != CHOOSE_PLANT_SCREEN){
-    Serial.print("screen plkant setup");
     showChoosePlantScreen();
   }
   bool down = Touch_getXY();
@@ -60,7 +59,7 @@ int LCDscreen::choosePlantsScreen(){
     val = 3;
   }
   else if (pot_4_btn.justPressed()) {
-    val = 2;
+    val = 4;
   }
   return val;
 }

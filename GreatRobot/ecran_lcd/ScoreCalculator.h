@@ -1,5 +1,5 @@
+#ifndef SCORE_CALCULATOR_H
 #define SCORE_CALCULATOR_H
-#ifdef SCORE_CALCULATOR_H
 
 class ScoreCalculator {
   public:
@@ -11,7 +11,7 @@ class ScoreCalculator {
     void addOneSonarPanelToScore();
     void addPAMIToScore();
     void addFinalZone();
-    void setNbrPlant(int newNbrPlant);
+    void setNbrPlant(int nbrPlant);
   private:
     static const int pts_per_plants = 3; 
     static const int pts_per_SolarPanel = 5; 
