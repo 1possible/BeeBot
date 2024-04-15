@@ -67,12 +67,7 @@ int LCDscreen::choosePlantsScreen(){
 int LCDscreen::scoreScreen(int Score){
   int val = -1;
   if(stateScreen != SCORE_SCREEN){
-    if(yellowTeam){
-      showScoreYELLOWScreen(Score);
-    }
-    else{
-      showScoreBLUEScreen(Score);
-    }
+    showScoreScreen(Score);
   }
   bool down = Touch_getXY();
   back_btn.press(down && back_btn.contains(pixel_x, pixel_y));
@@ -140,37 +135,29 @@ void LCDscreen::showChooseTeamScreen(){
       blue_btn.drawButton(false);
       stateScreen = CHOOSE_TEAM_SCREEN;
 }
-void LCDscreen::showScoreYELLOWScreen(int Score){
-          tft.fillScreen(YELLOW);
-        //print message
-        tft.setTextSize(4);
-        tft.setCursor(50, 100);
-        tft.setTextColor(BLACK);
-        tft.println("Estimated");
-        tft.setCursor(90, 130);
-        tft.println("score");
-        tft.setTextSize(20);
-        tft.setCursor(110, 220);
-        tft.println(Score);
-        digitalWrite(12, HIGH);
-        back_btn.initButton(&tft,  160, 420, 100, 40, WHITE, CYAN, BLACK, "BACK", 2);
-        back_btn.drawButton(false);
-        stateScreen = SCORE_SCREEN;
-}
-void LCDscreen::showScoreBLUEScreen(int Score){
-          tft.fillScreen(BLUE);
-        //print message
-        tft.setTextSize(4);
-        tft.setCursor(50, 100);
-        tft.setTextColor(WHITE);
-        tft.println("Estimated");
-        tft.setCursor(90, 130);
-        tft.println("score");
-        tft.setTextSize(20);
-        tft.setCursor(110, 220);
-        tft.println(Score);
-        digitalWrite(11, HIGH);
-        back_btn.initButton(&tft,  160, 420, 100, 40, WHITE, CYAN, BLACK, "BACK", 2);
-        back_btn.drawButton(false);
-        stateScreen = SCORE_SCREEN;
+void LCDscreen::showScoreScreen(int Score){
+  if(yellowTeam){
+    tft.fillScreen(YELLOW);
+    tft.setTextColor(BLACK);
+  }else{
+    tft.fillScreen(BLUE);
+    tft.setTextColor(WHITE);
+  }
+  //print message
+  tft.setTextSize(4);
+  tft.setCursor(50, 100);
+  tft.println("Estimated");
+  tft.setCursor(90, 130);
+  tft.println("score");
+  tft.setTextSize(20);
+  if(Score <10){
+    tft.setCursor(110, 220);
+  }else{
+    tft.setCursor(50, 220);
+  }
+  tft.println(Score);
+  digitalWrite(11, HIGH);
+  back_btn.initButton(&tft,  160, 420, 100, 40, WHITE, CYAN, BLACK, "BACK", 2);
+  back_btn.drawButton(false);
+  stateScreen = SCORE_SCREEN;
 }

@@ -19,6 +19,7 @@ class LCDscreen {
     int choosePlantsScreen();
     int scoreScreen(int Score);
     void setTeam(int team);
+    void showScoreScreen(int Score);
   private:
     static const int MINPRESSURE = 200;
     static const int MAXPRESSURE = 1000;
@@ -44,7 +45,6 @@ class LCDscreen {
 
     void showChooseTeamScreen();
     void showChoosePlantScreen();
-    void showScoreBLUEScreen(int Score);
     void showScoreYELLOWScreen(int Score);
 };
 #endif

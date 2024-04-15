@@ -1,17 +1,17 @@
 #include "lcd_screen.h"
+#include "ScoreCalculator.h"
 
 int Score = 0;
 enum{NBR_PLANT, CHOOSE_TEAM,SCORE} state;
 LCDscreen screen = LCDscreen();
+ScoreCalculator scoreCal = ScoreCalculator();
 void setup(void)
 {
   Serial.begin(9600);
-  Serial.println("setup in ...");
   pinMode(12, OUTPUT);
   pinMode(11, OUTPUT);
   screen.setup();
   state =NBR_PLANT;
-  Serial.println("setup out..");
 }
 
 void loop(void)
@@ -22,7 +22,7 @@ void loop(void)
     {
       btn_val = screen.choosePlantsScreen();
       if(btn_val != -1){
-        Serial.print("btn");
+        scoreCal.setNbrPlant(btn_val);
         state = CHOOSE_TEAM;
       }
       break;   
@@ -38,9 +38,11 @@ void loop(void)
     }
     case SCORE:
     {
-      btn_val = screen.scoreScreen(0);
+      btn_val = screen.scoreScreen(scoreCal.getScore());
       if(btn_val != -1){
-        state = NBR_PLANT;
+        scoreCal.addOneSonarPanelToScore();
+        screen.showScoreScreen(scoreCal.getScore());
+        //state = NBR_PLANT;
       }    
     }
   } 
