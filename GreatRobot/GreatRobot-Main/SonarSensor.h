@@ -10,8 +10,8 @@ public:
     float measureDistance();
     
 private:
-    const byte _triggerPin;
-    const byte _echoPin;
+    const int _triggerPin;
+    const int _echoPin;
     const unsigned long _MEASURE_TIMEOUT = 22000UL;
     const float _SOUND_SPEED = 340.0 / 1000;
 };

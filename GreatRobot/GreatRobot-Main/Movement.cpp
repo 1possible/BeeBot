@@ -17,3 +17,19 @@ void Movement::dodgeLeft() {
 void Movement::stopMovement() {
   motor.stopMotors();
 }
+
+void Movement::turnRight() {
+  motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, BACKWARD);
+}
+
+void Movement::turnLeft() {
+  motor.controlMotors(HIGH_SPEED, HIGH_SPEED, BACKWARD, FORWARD);
+}
+
+void Movement::forward() {
+  motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
+}
+
+void Movement::backward() {
+  motor.controlMotors(HIGH_SPEED, HIGH_SPEED, BACKWARD, BACKWARD);
+}

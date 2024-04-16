@@ -7,7 +7,7 @@
 unsigned long timeLine = 0;
 
 // MARK: Constructor
-LineFollower::LineFollower(int IR_left_pin,int IR_right_pin, Motor &motor) : motor(motor) {
+LineFollower::LineFollower(int IR_left_pin,int IR_right_pin) {
 
   // Initialization code, if needed
   IR_left_PIN = IR_left_pin;
@@ -53,7 +53,7 @@ bool LineFollower::followingLine(){
       }
       else
       {
-        moveForward();
+        Movement::forward();
       }
       break;
     }
@@ -81,7 +81,7 @@ bool LineFollower::followingLine(){
     case END:
     {
       endLine = true;
-      motor.controlMotors(0, 0, RELEASE, RELEASE);
+      Movement::stopMovement();
       break;
     }
   }
@@ -91,14 +91,14 @@ void LineFollower::followingLine_RUN(bool detectionLeft,bool detectionRigth){
   if(detectionLeft == HIGH and detectionRigth == HIGH){
     timeLineLength =millis();
     state_line = DOUBLE_DETECT;
-    moveForward();
+    Movement::forward();
   }
   else if( (detect_main_Right and detectionRigth == HIGH) or (!detect_main_Right and detectionLeft == HIGH))
   {
     rotation();
   }
   else{
-    moveForward();
+    Movement::forward();
   }
 
 }
@@ -112,11 +112,9 @@ void LineFollower::followingLine_END(Adafruit_DCMotor *LeftMotor,Adafruit_DCMoto
 }*/
 void LineFollower::rotation(){
   if(rotation_Right){
-    motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, BACKWARD);
+    Movement::turnRight();
   }else{
-    motor.controlMotors(HIGH_SPEED, HIGH_SPEED, BACKWARD, FORWARD);
+    Movement::turnLeft();
   }
 }
-void LineFollower::moveForward(){
-    motor.controlMotors(HIGH_SPEED, HIGH_SPEED, FORWARD, FORWARD);
-}
+

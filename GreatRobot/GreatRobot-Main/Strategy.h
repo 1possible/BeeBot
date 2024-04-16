@@ -1,7 +1,7 @@
 #ifndef STRATEGY_H
 #define STRATEGY_H
-#include "Motor.h"
 #include "LineFollower.h"
+#include "Movement.h"
 // MARK: Libraries
 //#include <Arduino.h>
 // #include <Adafruit_MotorShield.h>
@@ -17,7 +17,6 @@ class Strategy{
     unsigned long timeStartSTRAT;
     unsigned long timeStartStep;
     bool teamYellow;
-    static Motor motor; 
 };
 
 #endif
