@@ -40,22 +40,60 @@ void Strategy::play()
     }
     case STEP_FORWARD:
     {
-      if(millis()-timeStartStep > 1000){
+      if(millis()-timeStartStep > 1500){
         timeStartStep= millis();
-        strat_state = STEP_ROT;
+        strat_state = RELEASE_PLANTS;
         //Serial.println("stat start backward");
       }else{
         Movement::forward();
       }
       break;
     }
-    case STEP_ROT:
+    case RELEASE_PLANTS:
     {
-      if(millis()-timeStartStep > 4000){
+      if(millis()-timeStartStep > 4500){
         timeStartStep= millis();
-        strat_state = RETURN_TO_BASE;
+        Serial.println("ckpt:PlantZ");
+        strat_state = HARDCODE_ROT1;
       }else{
-        if(teamYellow){ 
+        Movement::backward();
+      }
+      break;
+    }
+    case HARDCODE_ROT1:
+    {
+      if(millis()-timeStartStep > 3000){
+        timeStartStep= millis();
+        Serial.println("ckpt:PlantZ");
+        strat_state = HARDCODE_BACKWARD1;
+      }else{
+        if(teamYellow){
+          Movement::turnLeft();
+        }else{
+          Movement::turnRight();
+        }
+      }
+      break;
+    }
+    case HARDCODE_BACKWARD1:
+    {
+      if(millis()-timeStartStep > 12000){
+        timeStartStep= millis();
+        Serial.println("ckpt:PlantZ");
+        strat_state = HARDCODE_ROT2;
+      }else{
+        Movement::backward();
+      }
+      break;
+    }
+    case HARDCODE_ROT2:
+    {
+      if(millis()-timeStartStep > 2000){
+        timeStartStep= millis();
+        Serial.println("ckpt:PlantZ");
+        strat_state = HARDCODE_BACKWARD2;
+      }else{
+        if(teamYellow){
           Movement::turnRight();
         }else{
           Movement::turnLeft();
@@ -63,16 +101,18 @@ void Strategy::play()
       }
       break;
     }
-    case RETURN_TO_BASE:
+    case HARDCODE_BACKWARD2:
     {
-      if(millis()-timeStartStep > 20000){
+      if(millis()-timeStartStep > 18000){
         timeStartStep= millis();
+        Serial.println("ckpt:PlantZ");
         strat_state = END;
       }else{
         Movement::backward();
       }
       break;
     }
+    
     case END:
     {
       Movement::stopMovement();
