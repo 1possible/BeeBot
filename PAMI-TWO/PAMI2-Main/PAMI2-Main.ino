@@ -59,7 +59,7 @@ void setup() {
   pinMode(IRright_PIN, INPUT); 
 
   pinMode(startPin, INPUT_PULLUP);
-  pinMode(switchGroup, INPUT);
+  pinMode(switchGroup, INPUT_PULLUP);
 
   state = WAIT;
 }
