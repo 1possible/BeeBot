@@ -16,7 +16,7 @@ class SolarPanels {
     void play();
 };
 
-extern int ECHO_PIN_9;
+extern int ECHO_PIN_SolarPan;
 extern int TRIGGER_PIN;
 
 #endif

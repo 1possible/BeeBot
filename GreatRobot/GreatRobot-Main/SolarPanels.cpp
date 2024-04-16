@@ -1,7 +1,7 @@
 #include "SolarPanels.h"
 
 Motor SolarPanels::motor; 
-SolarPanels::SolarPanels() : sonarSensor(TRIGGER_PIN, ECHO_PIN_9) {}
+SolarPanels::SolarPanels() : sonarSensor(TRIGGER_PIN, ECHO_PIN_SolarPan) {}
 
 void SolarPanels::setupSolarPanels() {
     sonarSensor.setup();
