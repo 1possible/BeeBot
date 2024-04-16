@@ -1,9 +1,10 @@
 #include "Strategy.h"
 
-Strategy::Strategy(LineFollower * lineFollower_PARAM)
+Strategy::Strategy(LineFollower * lineFollower_PARAM, SolarPanels * solarPanel_PARAM)
 {
   lineFollower = lineFollower_PARAM;
   strat_state = START;
+  solarPanel = solarPanel_PARAM;
 }
 void Strategy::setTeam(int newTeam){
    if (newTeam == 1)
@@ -27,6 +28,11 @@ void Strategy::play()
     case START:
     {
       timeStartSTRAT = millis();
+      strat_state = SOLAR_PANEL;
+    }
+    case SOLAR_PANEL :
+    {
+      solarPanel->play();
       strat_state = FOLLOW_LINE;
     }
     case FOLLOW_LINE:

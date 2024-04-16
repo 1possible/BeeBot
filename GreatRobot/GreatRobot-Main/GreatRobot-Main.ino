@@ -32,7 +32,6 @@ CommunicationArduinoLCD communicationArduinoLCD;
 Motor motor;
 //EncoderLogic encoderLogic(encoR_PIN, encoL_PIN);
 LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN);
-Strategy strategy = Strategy(&lineFollower);
 SonarSensor sonarSensor1(TRIGGER_PIN, ECHO_PIN_1);
 SonarSensor sonarSensor2(TRIGGER_PIN, ECHO_PIN_2);
 SonarSensor sonarSensor3(TRIGGER_PIN, ECHO_PIN_3);
@@ -41,6 +40,9 @@ SonarSensor sonarSensor5(TRIGGER_PIN, ECHO_PIN_5);
 SonarSensor sonarSensor6(TRIGGER_PIN, ECHO_PIN_6);
 SonarSensor sonarSensor7(TRIGGER_PIN, ECHO_PIN_7);
 SonarSensor sonarSensor8(TRIGGER_PIN, ECHO_PIN_8);
+SonarSensor sonarSensorSolarPan(TRIGGER_PIN, ECHO_PIN_SolarPan);
+SolarPanels solarPanel = SolarPanels(&sonarSensorSolarPan);
+Strategy strategy = Strategy(&lineFollower, &solarPanel );
 
 
 // DEFINE CONSTANTS
@@ -77,6 +79,7 @@ void setup() {
   sonarSensor6.setup();
   sonarSensor7.setup();
   sonarSensor8.setup();
+  sonarSensorSolarPan.setup();
 }
 
 
@@ -112,10 +115,12 @@ void loop() {
       distance6 = sonarSensor6.measureDistance();
       distance7 = sonarSensor7.measureDistance();
       distance8 = sonarSensor8.measureDistance();
+      /*int distanceTest = sonarSensorSolarPan.measureDistance();
       Serial.println("distance 1 : "+String(distance1));
       Serial.println("distance 2 : "+String(distance2));
       Serial.println("distance 7 : "+String(distance7));
       Serial.println("distance 8 : "+String(distance8));
+      Serial.println("distance test : "+String(distanceTest));*/
         if ((distance1 != 0 && distance1 < 100.0) || (distance2 != 0 && distance2 < 100.0)|| (distance3 != 0 && distance3 < 100.0) ||(distance4 != 0 && distance4 < 100.0) ||(distance5 != 0 && distance5 < 100.0) ||(distance6 != 0 && distance6 < 100.0) ||(distance7 != 0 && distance7 < 100.0) ||(distance8 != 0 && distance8 < 100.0)) {
           Movement::stopMovement();
           state = HOMOLOGATION;

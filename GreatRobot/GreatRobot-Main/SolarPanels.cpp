@@ -1,10 +1,12 @@
 #include "SolarPanels.h"
 
 Motor SolarPanels::motor; 
-SolarPanels::SolarPanels() : sonarSensor(TRIGGER_PIN, ECHO_PIN_SolarPan) {}
+SolarPanels::SolarPanels(SonarSensor* sonarsensor_PARAM) {
+  sonarSensor = sonarsensor_PARAM;
+}
 
 void SolarPanels::setupSolarPanels() {
-    sonarSensor.setup();
+    //sonarSensor.setup();
 }
 
 // Define an enumeration for different states
@@ -20,18 +22,19 @@ const int MAX_ITERATIONS = 3;
 float distanceFromSolarPanel;
 
 void SolarPanels::play() {
+  motor.openSolarPanelArm();
     while (iterationCount < MAX_ITERATIONS) {
         switch (currentState) {
             case STATE_FORWARD:
-                Serial.println("State: FORWARD");
+                Serial.println("State:FORWARD");
                 Movement::backward();
                 
                 // Check if solar panel is detected
-                distanceFromSolarPanel = sonarSensor.measureDistance();
+                distanceFromSolarPanel = sonarSensor->measureDistance();
                 Serial.println("Distance from solar panel: " + String(distanceFromSolarPanel));
                 
                 // If solar panel is detected, transition to STATE_TURN_SOLAR_PANEL
-                if (distanceFromSolarPanel >= 100 && distanceFromSolarPanel <= 200) {
+                if (distanceFromSolarPanel >= 120 && distanceFromSolarPanel <= 200) {
                     Serial.println("Solar panel detected");
                     currentState = STATE_TURN_SOLAR_PANEL;
                     iterationCount++;
@@ -39,6 +42,7 @@ void SolarPanels::play() {
                 break;
 
             case STATE_TURN_SOLAR_PANEL:
+                Movement::stopMovement();
                 Serial.println("State: TURN_SOLAR_PANEL");
                 motor.turnSolarPanel();
                 currentState = STATE_FORWARD;

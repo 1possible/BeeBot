@@ -7,16 +7,16 @@
 
 class SolarPanels {
   private:
-    SonarSensor sonarSensor;
+    SonarSensor* sonarSensor;
     static Motor motor;
 
   public:
-    SolarPanels();
+    SolarPanels(SonarSensor* sonarSensor);
     void setupSolarPanels();
     void play();
 };
 
-extern int ECHO_PIN_SolarPan;
-extern int TRIGGER_PIN;
+//extern int ECHO_PIN_SolarPan;
+//extern int TRIGGER_PIN;
 
 #endif
