@@ -24,7 +24,7 @@ void SolarPanels::play() {
         switch (currentState) {
             case STATE_FORWARD:
                 Serial.println("State: FORWARD");
-                Movement::forward();
+                Movement::backward();
                 
                 // Check if solar panel is detected
                 distanceFromSolarPanel = sonarSensor.measureDistance();
