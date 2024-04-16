@@ -80,6 +80,7 @@ void setup() {
   sonarSensor7.setup();
   sonarSensor8.setup();
   sonarSensorSolarPan.setup();
+  solarPanel.setup();
 }
 
 

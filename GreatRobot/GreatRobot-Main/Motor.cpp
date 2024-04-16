@@ -41,7 +41,12 @@ void Motor::openSolarPanelArm() {
   delay(1000);
   TriggerArmMotor->run(RELEASE);
 }
-
+void Motor::closeSolarPanelArm() {
+  TriggerArmMotor->setSpeed(100); 
+  TriggerArmMotor->run(BACKWARD);
+  delay(1000);
+  TriggerArmMotor->run(RELEASE);
+}
 void Motor::turnSolarPanel() {
   TurnSolarPanelMotor->setSpeed(100); 
   TurnSolarPanelMotor->run(BACKWARD);

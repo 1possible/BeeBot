@@ -11,12 +11,14 @@ void Strategy::setTeam(int newTeam){
    {
     teamYellow = true;
     lineFollower->setTeam(1);
+    solarPanel->setTeam(1);
    }
    //BLUE TEAM
    else if (newTeam == 2)
    {
     teamYellow = false;
     lineFollower->setTeam(2);
+    solarPanel->setTeam(2);
    }
 }
 void Strategy::play()
@@ -32,8 +34,11 @@ void Strategy::play()
     }
     case SOLAR_PANEL :
     {
-      solarPanel->play();
-      strat_state = FOLLOW_LINE;
+      bool endSolarPanel =solarPanel->play();
+      if(endSolarPanel){
+        strat_state = FOLLOW_LINE;
+      }
+      break;
     }
     case FOLLOW_LINE:
     {
@@ -49,7 +54,6 @@ void Strategy::play()
       if(millis()-timeStartStep > 1000){
         timeStartStep= millis();
         strat_state = STEP_ROT;
-        //Serial.println("stat start backward");
       }else{
         Movement::forward();
       }
