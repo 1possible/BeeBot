@@ -44,6 +44,6 @@ bool SonarSensor::detection(){
   return val_detect;
 }
 
-int SonarSensor::getDistance(){
+float SonarSensor::getDistance(){
   return distance;
 }

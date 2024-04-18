@@ -8,7 +8,7 @@
 #include "LineFollower.h"
 #include "Movement.h"
 #include "Strategy.h"
-
+#include "DetectionManager.h"
 // DEFINE PINS
 //const int encoR_PIN = 2;              // Encoder
 //const int encoL_PIN = 3;
@@ -40,7 +40,7 @@ SonarSensor sonarSensorNW(TRIGGER_PIN, ECHO_PIN_NW);
 SonarSensor sonarSensorNE(TRIGGER_PIN, ECHO_PIN_NE);
 SonarSensor sonarSensorSW(TRIGGER_PIN, ECHO_PIN_SW);
 SonarSensor sonarSensorSE(TRIGGER_PIN, ECHO_PIN_SE);
-
+DetectionManager detectionManager(&sonarSensorN,&sonarSensorNE,&sonarSensorE,&sonarSensorSE,&sonarSensorS,&sonarSensorSW,&sonarSensorW,&sonarSensorNW);
 
 // DEFINE CONSTANTS
 const uint8_t LOW_SPEED = 75;                                 // motor speeds
@@ -69,14 +69,7 @@ void setup() {
   Serial.begin(9600);                         // Serial (comm ard-lcd)
   state = TEAM_CHOICE;                        // Statemachine
   pinMode(start_switch_PIN, INPUT_PULLUP);    // Starter_switch
-  sonarSensorN.setup(150,750);                       // Sonar sensor
-  sonarSensorW.setup(150,750);
-  sonarSensorE.setup(150,750);
-  sonarSensorS.setup(150,750);
-  sonarSensorNW.setup(150,750);
-  sonarSensorNE.setup(150,750);
-  sonarSensorSW.setup(150,750);
-  sonarSensorSE.setup(150,750);
+  detectionManager.setup();
   timeLastDebug = millis();
 }
 
@@ -105,7 +98,7 @@ void loop() {
     case RUN:
     {
       timeNow = millis()-timeStartRUN;
-        if (sonarSensorN.detection() || sonarSensorW.detection() || sonarSensorE.detection() ||sonarSensorS.detection() ||sonarSensorNE.detection() ||sonarSensorNW.detection() ||sonarSensorSE.detection()||sonarSensorSW.detection()) {
+        if (detectionManager.detection()) {
           Movement::stopMovement();
           state = DETECTION;
         }
@@ -137,7 +130,7 @@ void loop() {
     }
     case DETECTION:
     {
-      if (!(sonarSensorN.detection() || sonarSensorW.detection() || sonarSensorE.detection() ||sonarSensorS.detection() ||sonarSensorNE.detection() ||sonarSensorNW.detection() ||sonarSensorSE.detection()||sonarSensorSW.detection())){
+      if (!detectionManager.detection()){
         state = RUN;
       }
       /*

@@ -9,7 +9,7 @@ public:
     void setup(int cal_dist_detect, unsigned long newHoldTime);
     float measureDistance();
     bool detection();
-    int getDistance();
+    float getDistance();
     void setDistanceDetection(int newValDistDetect);
     void setHoldTime(int newHoldTime);
     
@@ -19,7 +19,7 @@ private:
     const unsigned long _MEASURE_TIMEOUT = 22000UL;
     const float _SOUND_SPEED = 340.0 / 1000;
     int distDetect;
-    int distance;
+    float distance;
     unsigned long timeLastDetection;
     unsigned int holdTime;
     bool val_detect;
