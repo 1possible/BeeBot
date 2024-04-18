@@ -15,14 +15,14 @@
 const int IR_left_PIN = 9;            // IR sensor
 const int IR_right_PIN = 10;
 const int TRIGGER_PIN = 52;           // Pin sonor sensor
-const int ECHO_PIN_N = 44;
-const int ECHO_PIN_NE = 45;  
-const int ECHO_PIN_E = 46;
-const int ECHO_PIN_SE = 47; 
-const int ECHO_PIN_S = 48; 
-const int ECHO_PIN_SW = 49; 
-const int ECHO_PIN_W = 50; 
-const int ECHO_PIN_NW = 51; 
+const int ECHO_PIN_S = 44; 
+const int ECHO_PIN_SW = 45;  
+const int ECHO_PIN_SE = 46; 
+const int ECHO_PIN_W = 47; 
+const int ECHO_PIN_E = 48; 
+const int ECHO_PIN_NW = 49; 
+const int ECHO_PIN_NE = 50; 
+const int ECHO_PIN_N = 51; 
 const int start_switch_PIN = 11;      // Starter switch (cordon)
 
 
@@ -33,13 +33,13 @@ Motor motor;
 LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN);
 Strategy strategy = Strategy(&lineFollower);
 SonarSensor sonarSensorN(TRIGGER_PIN, ECHO_PIN_N);
-SonarSensor sonarSensorW(TRIGGER_PIN, ECHO_PIN_NE);
+SonarSensor sonarSensorW(TRIGGER_PIN, ECHO_PIN_W);
 SonarSensor sonarSensorE(TRIGGER_PIN, ECHO_PIN_E);
-SonarSensor sonarSensorS(TRIGGER_PIN, ECHO_PIN_SE);
-SonarSensor sonarSensorNW(TRIGGER_PIN, ECHO_PIN_S);
-SonarSensor sonarSensorNE(TRIGGER_PIN, ECHO_PIN_SW);
-SonarSensor sonarSensorSW(TRIGGER_PIN, ECHO_PIN_W);
-SonarSensor sonarSensorSE(TRIGGER_PIN, ECHO_PIN_NW);
+SonarSensor sonarSensorS(TRIGGER_PIN, ECHO_PIN_S);
+SonarSensor sonarSensorNW(TRIGGER_PIN, ECHO_PIN_NW);
+SonarSensor sonarSensorNE(TRIGGER_PIN, ECHO_PIN_NE);
+SonarSensor sonarSensorSW(TRIGGER_PIN, ECHO_PIN_SW);
+SonarSensor sonarSensorSE(TRIGGER_PIN, ECHO_PIN_SE);
 
 
 // DEFINE CONSTANTS
@@ -57,7 +57,8 @@ float distance6 = 0.0;
 float distance7 = 0.0;
 float distance8 = 0.0;
 
-
+unsigned long timeLastDebug;
+unsigned long timeToUpdateDebug = 2000;
 
 enum { TEAM_CHOICE, WAIT, RUN, HOMOLOGATION, END} state; 
 
@@ -76,6 +77,7 @@ void setup() {
   sonarSensorNE.setup(150);
   sonarSensorSW.setup(150);
   sonarSensorSE.setup(150);
+  timeLastDebug = millis();
 }
 
 
@@ -110,6 +112,25 @@ void loop() {
         else{
           strategy.play();
         }
+        if(millis()-timeLastDebug >= timeToUpdateDebug){
+            Serial.print("Distance N: ");
+            Serial.println(sonarSensorN.getDistance());
+            Serial.print("Distance E: ");
+            Serial.println(sonarSensorE.getDistance());
+            Serial.print("Distance W: ");
+            Serial.println(sonarSensorW.getDistance());
+            Serial.print("Distance S: ");
+            Serial.println(sonarSensorS.getDistance());
+            Serial.print("Distance NE: ");
+            Serial.println(sonarSensorNE.getDistance());
+            Serial.print("Distance NW: ");
+            Serial.println(sonarSensorNW.getDistance());
+            Serial.print("Distance SE: ");
+            Serial.println(sonarSensorSE.getDistance());
+            Serial.print("Distance SW: ");
+            Serial.println(sonarSensorSW.getDistance());
+            timeLastDebug = millis();
+          }
       break;
     }
     case HOMOLOGATION:
@@ -117,30 +138,29 @@ void loop() {
       if (!(sonarSensorN.detection() || sonarSensorW.detection() || sonarSensorE.detection() ||sonarSensorS.detection() ||sonarSensorNE.detection() ||sonarSensorNW.detection() ||sonarSensorSE.detection()||sonarSensorSW.detection())){
         state = RUN;
       }
+      if(millis()-timeLastDebug >= timeToUpdateDebug){
+          Serial.print("Distance N: ");
+          Serial.println(sonarSensorN.getDistance());
+          Serial.print("Distance E: ");
+          Serial.println(sonarSensorE.getDistance());
+          Serial.print("Distance W: ");
+          Serial.println(sonarSensorW.getDistance());
+          Serial.print("Distance S: ");
+          Serial.println(sonarSensorS.getDistance());
+          Serial.print("Distance NE: ");
+          Serial.println(sonarSensorNE.getDistance());
+          Serial.print("Distance NW: ");
+          Serial.println(sonarSensorNW.getDistance());
+          Serial.print("Distance SE: ");
+          Serial.println(sonarSensorSE.getDistance());
+          Serial.print("Distance SW: ");
+          Serial.println(sonarSensorSW.getDistance());
+          timeLastDebug = millis();
+          }
       break;
     }
     case END:
     {
-    /*
-      Serial.print("Distance cycle Motor Two: ");                   // Encoder
-      Serial.print(encoderLogic.getDistanceMotorTwo());
-      Serial.println(" cm");
-
-      Serial.print("Distance cycle Motor Four: ");
-      Serial.print(encoderLogic.getDistanceMotorFour());
-      Serial.println(" cm");
-
-      Serial.print("Total Distance Motor Two: ");
-      Serial.print(encoderLogic.getTotalDistanceMotorTwo());
-      Serial.println(" cm");
-
-      Serial.print("Total Distance Motor Four: ");
-      Serial.print(encoderLogic.getTotalDistanceMotorFour());
-      Serial.println(" cm");
-
-      delay(1000);
-      */
-
       Movement::stopMovement();
       state = TEAM_CHOICE;
       // Serial.println("END");

@@ -9,6 +9,7 @@ public:
     void setup(int cal_dist_detect);
     float measureDistance();
     bool detection();
+    int getDistance();
     
 private:
     const int _triggerPin;
@@ -16,6 +17,7 @@ private:
     const unsigned long _MEASURE_TIMEOUT = 22000UL;
     const float _SOUND_SPEED = 340.0 / 1000;
     int dist_detect;
+    int distance;
 };
 
 #endif

@@ -8,6 +8,7 @@ void SonarSensor::setup(int val_dist_detect) {
     digitalWrite(_triggerPin, LOW); // Trigger pin should be LOW initially
     pinMode(_echoPin, INPUT);
     dist_detect = val_dist_detect;
+    distance = 0;
 }
 
 // Send the distance in mm
@@ -24,9 +25,13 @@ float SonarSensor::measureDistance() {
 
 bool SonarSensor::detection(){
   bool val_detect = true;
-  int distance = measureDistance();
+  distance = measureDistance();
   if(distance == 0 || distance > dist_detect){
     val_detect = false;
   }
   return val_detect;
+}
+
+int SonarSensor::getDistance(){
+  return distance;
 }

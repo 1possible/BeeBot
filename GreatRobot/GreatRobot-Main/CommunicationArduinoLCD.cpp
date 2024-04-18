@@ -10,12 +10,14 @@ int CommunicationArduinoLCD::chooseTeam(){
     String serialCommand = serialStr.substring(0, sepaIndex);
     String serialData = serialStr.substring(sepaIndex + 1);
     if(serialCommand.indexOf("Team") != -1){
-      if (serialData == "1"){
+      if (serialData.indexOf("1")!=-1){
         team = 1;
+        Serial.println("Team:OK");
       }
       //BLUE TEAM
-      else if (serialData == "2"){
+      else if (serialData.indexOf("2")!=-1){
         team = 2;
+        Serial.println("Team:OK");
       }
     }
   }
