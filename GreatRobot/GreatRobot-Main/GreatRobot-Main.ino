@@ -15,14 +15,14 @@
 const int IR_left_PIN = 9;            // IR sensor
 const int IR_right_PIN = 10;
 const int TRIGGER_PIN = 52;           // Pin sonor sensor
-const int ECHO_PIN_1 = 44;
-const int ECHO_PIN_2 = 45;  
-const int ECHO_PIN_3 = 46;
-const int ECHO_PIN_4 = 47; 
-const int ECHO_PIN_5 = 48; 
-const int ECHO_PIN_6 = 49; 
-const int ECHO_PIN_7 = 50; 
-const int ECHO_PIN_8 = 51; 
+const int ECHO_PIN_N = 44;
+const int ECHO_PIN_NE = 45;  
+const int ECHO_PIN_E = 46;
+const int ECHO_PIN_SE = 47; 
+const int ECHO_PIN_S = 48; 
+const int ECHO_PIN_SW = 49; 
+const int ECHO_PIN_W = 50; 
+const int ECHO_PIN_NW = 51; 
 const int start_switch_PIN = 11;      // Starter switch (cordon)
 
 
@@ -32,14 +32,14 @@ Motor motor;
 //EncoderLogic encoderLogic(encoR_PIN, encoL_PIN);
 LineFollower lineFollower = LineFollower(IR_left_PIN, IR_right_PIN);
 Strategy strategy = Strategy(&lineFollower);
-SonarSensor sonarSensor1(TRIGGER_PIN, ECHO_PIN_1);
-SonarSensor sonarSensor2(TRIGGER_PIN, ECHO_PIN_2);
-SonarSensor sonarSensor3(TRIGGER_PIN, ECHO_PIN_3);
-SonarSensor sonarSensor4(TRIGGER_PIN, ECHO_PIN_4);
-SonarSensor sonarSensor5(TRIGGER_PIN, ECHO_PIN_5);
-SonarSensor sonarSensor6(TRIGGER_PIN, ECHO_PIN_6);
-SonarSensor sonarSensor7(TRIGGER_PIN, ECHO_PIN_7);
-SonarSensor sonarSensor8(TRIGGER_PIN, ECHO_PIN_8);
+SonarSensor sonarSensorN(TRIGGER_PIN, ECHO_PIN_N);
+SonarSensor sonarSensorW(TRIGGER_PIN, ECHO_PIN_NE);
+SonarSensor sonarSensorE(TRIGGER_PIN, ECHO_PIN_E);
+SonarSensor sonarSensorS(TRIGGER_PIN, ECHO_PIN_SE);
+SonarSensor sonarSensorNW(TRIGGER_PIN, ECHO_PIN_S);
+SonarSensor sonarSensorNE(TRIGGER_PIN, ECHO_PIN_SW);
+SonarSensor sonarSensorSW(TRIGGER_PIN, ECHO_PIN_W);
+SonarSensor sonarSensorSE(TRIGGER_PIN, ECHO_PIN_NW);
 
 
 // DEFINE CONSTANTS
@@ -68,14 +68,14 @@ void setup() {
   Serial.begin(9600);                         // Serial (comm ard-lcd)
   state = TEAM_CHOICE;                        // Statemachine
   pinMode(start_switch_PIN, INPUT_PULLUP);    // Starter_switch
-  sonarSensor1.setup();                       // Sonar sensor
-  sonarSensor2.setup();
-  sonarSensor3.setup();
-  sonarSensor4.setup();
-  sonarSensor5.setup();
-  sonarSensor6.setup();
-  sonarSensor7.setup();
-  sonarSensor8.setup();
+  sonarSensorN.setup(150);                       // Sonar sensor
+  sonarSensorW.setup(150);
+  sonarSensorE.setup(150);
+  sonarSensorS.setup(150);
+  sonarSensorNW.setup(150);
+  sonarSensorNE.setup(150);
+  sonarSensorSW.setup(150);
+  sonarSensorSE.setup(150);
 }
 
 
@@ -103,19 +103,7 @@ void loop() {
     case RUN:
     {
       timeNow = millis()-timeStartRUN;
-      distance1 = sonarSensor1.measureDistance();
-      distance2 = sonarSensor2.measureDistance();
-      distance3 = sonarSensor3.measureDistance();
-      distance4 = sonarSensor4.measureDistance();
-      distance5 = sonarSensor5.measureDistance();
-      distance6 = sonarSensor6.measureDistance();
-      distance7 = sonarSensor7.measureDistance();
-      distance8 = sonarSensor8.measureDistance();
-      Serial.println("distance 1 : "+String(distance1));
-      Serial.println("distance 2 : "+String(distance2));
-      Serial.println("distance 7 : "+String(distance7));
-      Serial.println("distance 8 : "+String(distance8));
-        if ((distance1 != 0 && distance1 < 100.0) || (distance2 != 0 && distance2 < 100.0)|| (distance3 != 0 && distance3 < 100.0) ||(distance4 != 0 && distance4 < 100.0) ||(distance5 != 0 && distance5 < 100.0) ||(distance6 != 0 && distance6 < 100.0) ||(distance7 != 0 && distance7 < 100.0) ||(distance8 != 0 && distance8 < 100.0)) {
+        if (sonarSensorN.detection() || sonarSensorW.detection() || sonarSensorE.detection() ||sonarSensorS.detection() ||sonarSensorNE.detection() ||sonarSensorNW.detection() ||sonarSensorSE.detection()||sonarSensorSW.detection()) {
           Movement::stopMovement();
           state = HOMOLOGATION;
         }
@@ -126,15 +114,7 @@ void loop() {
     }
     case HOMOLOGATION:
     {
-      distance1 = sonarSensor1.measureDistance();
-      distance2 = sonarSensor2.measureDistance();
-      distance3 = sonarSensor3.measureDistance();
-      distance4 = sonarSensor4.measureDistance();
-      distance5 = sonarSensor5.measureDistance();
-      distance6 = sonarSensor6.measureDistance();
-      distance7 = sonarSensor7.measureDistance();
-      distance8 = sonarSensor8.measureDistance();
-      if ((distance1 == 0 || distance1 > 100) && (distance2 == 0 || distance2 > 100) && (distance3 == 0 || distance3 > 100) && (distance4 == 0 || distance4 > 100)&& (distance5 == 0 || distance5 > 100)&& (distance6 == 0 || distance6 > 100)&& (distance7 == 0 || distance7 > 100)&& (distance8 == 0 || distance8 > 100)){
+      if (!(sonarSensorN.detection() || sonarSensorW.detection() || sonarSensorE.detection() ||sonarSensorS.detection() ||sonarSensorNE.detection() ||sonarSensorNW.detection() ||sonarSensorSE.detection()||sonarSensorSW.detection())){
         state = RUN;
       }
       break;

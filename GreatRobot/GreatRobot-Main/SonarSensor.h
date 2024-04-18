@@ -6,14 +6,16 @@
 class SonarSensor {
 public:
     SonarSensor(byte triggerPin, byte echoPin);
-    void setup();
+    void setup(int cal_dist_detect);
     float measureDistance();
+    bool detection();
     
 private:
     const int _triggerPin;
     const int _echoPin;
     const unsigned long _MEASURE_TIMEOUT = 22000UL;
     const float _SOUND_SPEED = 340.0 / 1000;
+    int dist_detect;
 };
 
 #endif
