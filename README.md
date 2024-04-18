@@ -20,7 +20,7 @@
 
 ## :question: About the project
 
-The purpose of this project is create a robot that will be able to rotate the solar pannel.
+The purpose of this project is create a robot that will be able to take the plants and put them in a greenhousse. If we have enought time we will try to rotate the solar pannel in the wright direction before going to the last greenhouse to "recharge" the robot.
 
 ## :rocket: Getting started
 
