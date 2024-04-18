@@ -5,6 +5,9 @@ Strategy::Strategy(LineFollower * lineFollower_PARAM)
   lineFollower = lineFollower_PARAM;
   strat_state = START;
 }
+void Strategy::setup(){
+  timer.setup();
+}
 void Strategy::setTeam(int newTeam){
    if (newTeam == 1)
    {
@@ -33,15 +36,15 @@ void Strategy::play()
     {
       bool endline =lineFollower->followingLine();
       if(endline){
-        timeStartStep= millis();
+        timer.setTimer(STEPFORWARDtime);
         strat_state = STEP_FORWARD;
       }
       break;
     }
     case STEP_FORWARD:
     {
-      if(millis()-timeStartStep > 1500){
-        timeStartStep= millis();
+      if(timer.endOfTimer()){
+        timer.setTimer(RELEASEPLANTStime);
         strat_state = RELEASE_PLANTS;
         //Serial.println("stat start backward");
       }else{
@@ -51,8 +54,8 @@ void Strategy::play()
     }
     case RELEASE_PLANTS:
     {
-      if(millis()-timeStartStep > 4500){
-        timeStartStep= millis();
+      if(timer.endOfTimer()){
+        timer.setTimer(HARDCODEROT1time);
         Serial.println("ckpt:PlantZ");
         strat_state = HARDCODE_ROT1;
       }else{
@@ -62,9 +65,8 @@ void Strategy::play()
     }
     case HARDCODE_ROT1:
     {
-      if(millis()-timeStartStep > 3000){
-        timeStartStep= millis();
-        Serial.println("ckpt:PlantZ");
+      if(timer.endOfTimer()){
+        timer.setTimer(HARDCODEBACKWARD1time);
         strat_state = HARDCODE_BACKWARD1;
       }else{
         if(teamYellow){
@@ -77,9 +79,8 @@ void Strategy::play()
     }
     case HARDCODE_BACKWARD1:
     {
-      if(millis()-timeStartStep > 12000){
-        timeStartStep= millis();
-        Serial.println("ckpt:PlantZ");
+      if(timer.endOfTimer()){
+        timer.setTimer(HARDCODEROT2time);
         strat_state = HARDCODE_ROT2;
       }else{
         Movement::backward();
@@ -88,9 +89,8 @@ void Strategy::play()
     }
     case HARDCODE_ROT2:
     {
-      if(millis()-timeStartStep > 2000){
-        timeStartStep= millis();
-        Serial.println("ckpt:PlantZ");
+      if(timer.endOfTimer()){
+        timer.setTimer(HARDCODEBACKWARD2time);
         strat_state = HARDCODE_BACKWARD2;
       }else{
         if(teamYellow){
@@ -103,9 +103,8 @@ void Strategy::play()
     }
     case HARDCODE_BACKWARD2:
     {
-      if(millis()-timeStartStep > 18000){
-        timeStartStep= millis();
-        Serial.println("ckpt:PlantZ");
+      if(timer.endOfTimer()){
+        Serial.println("ckpt:FZ");
         strat_state = END;
       }else{
         Movement::backward();
@@ -118,5 +117,17 @@ void Strategy::play()
       Movement::stopMovement();
       break;
     }
+  }
+}
+void Strategy::activateTimer(){
+  timer.activate();
+  if(strat_state == FOLLOW_LINE){
+    lineFollower->activateTimer();
+  }
+}
+void Strategy::disableTimer(){
+  timer.disable();
+  if(strat_state == FOLLOW_LINE){
+    lineFollower->disableTimer();
   }
 }

@@ -71,6 +71,7 @@ void setup() {
   pinMode(start_switch_PIN, INPUT_PULLUP);    // Starter_switch
   detectionManager.setup();
   timeLastDebug = millis();
+  strategy.setup();
 }
 
 
@@ -100,6 +101,7 @@ void loop() {
       timeNow = millis()-timeStartRUN;
         if (detectionManager.detection()) {
           Movement::stopMovement();
+          strategy.disableTimer();
           state = DETECTION;
         }
         else{
@@ -132,6 +134,7 @@ void loop() {
     {
       if (!detectionManager.detection()){
         state = RUN;
+        strategy.activateTimer();
       }
       /*
       if(millis()-timeLastDebug >= timeToUpdateDebug){

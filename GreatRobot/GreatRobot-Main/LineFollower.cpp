@@ -1,14 +1,8 @@
-// MARK: Libraries
-
 // MARK: Modules
 #include "LineFollower.h"
 
-// MARK: Variables
-unsigned long timeLine = 0;
-
 // MARK: Constructor
 LineFollower::LineFollower(int IR_left_pin,int IR_right_pin) {
-
   // Initialization code, if needed
   IR_left_PIN = IR_left_pin;
   IR_right_PIN = IR_right_pin;
@@ -20,6 +14,7 @@ void LineFollower::setup() {
   pinMode(IR_right_PIN, INPUT);
   detect_main_Right = true;
   rotation_Right = true;
+  timer.setup();
 }
 
 void LineFollower::setTeam(int team){
@@ -45,7 +40,7 @@ bool LineFollower::followingLine(){
     case DOUBLE_DETECT:
     {
       if(detectionLeft == LOW or detectionRigth == LOW){
-        if(millis()- timeLineLength >= time_to_end){
+        if(timer.endOfTimer()){
           state_line = END;
         }else{
           state_line = RETURN_TO_LINE_1;
@@ -89,7 +84,7 @@ bool LineFollower::followingLine(){
 }
 void LineFollower::followingLine_RUN(bool detectionLeft,bool detectionRigth){
   if(detectionLeft == HIGH and detectionRigth == HIGH){
-    timeLineLength =millis();
+    timer.setTimer(timeToEnd);
     state_line = DOUBLE_DETECT;
     Movement::forward();
   }
@@ -116,5 +111,11 @@ void LineFollower::rotation(){
   }else{
     Movement::turnLeft();
   }
+}
+void LineFollower::activateTimer(){
+  timer.activate();
+}
+void LineFollower::disableTimer(){
+  timer.disable();
 }
 
