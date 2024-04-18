@@ -3,12 +3,21 @@
 SonarSensor::SonarSensor(byte triggerPin, byte echoPin)
     : _triggerPin(triggerPin), _echoPin(echoPin) {}
 
-void SonarSensor::setup(int val_dist_detect) {
+void SonarSensor::setup(int newValDistDetect, unsigned long newHoldTime) {
     pinMode(_triggerPin, OUTPUT);
     digitalWrite(_triggerPin, LOW); // Trigger pin should be LOW initially
     pinMode(_echoPin, INPUT);
-    dist_detect = val_dist_detect;
+    distDetect = newValDistDetect;
     distance = 0;
+    timeLastDetection = 0;
+    holdTime = newHoldTime;
+}
+
+void SonarSensor::setDistanceDetection(int newValDistDetect){
+  distDetect = newValDistDetect;
+}
+void SonarSensor::setHoldTime(int newHoldTime){
+  holdTime = newHoldTime;
 }
 
 // Send the distance in mm
@@ -24,9 +33,12 @@ float SonarSensor::measureDistance() {
 }
 
 bool SonarSensor::detection(){
-  bool val_detect = true;
   distance = measureDistance();
-  if(distance == 0 || distance > dist_detect){
+  if(distance != 0 & distance < distDetect){
+    val_detect = true;
+    timeLastDetection = millis();
+  }
+  else if(val_detect & millis()-timeLastDetection >holdTime){
     val_detect = false;
   }
   return val_detect;

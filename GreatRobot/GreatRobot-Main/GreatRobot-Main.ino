@@ -58,9 +58,9 @@ float distance7 = 0.0;
 float distance8 = 0.0;
 
 unsigned long timeLastDebug;
-unsigned long timeToUpdateDebug = 2000;
+unsigned long timeToUpdateDebug = 1000;
 
-enum { TEAM_CHOICE, WAIT, RUN, HOMOLOGATION, END} state; 
+enum { TEAM_CHOICE, WAIT, RUN, DETECTION, END} state; 
 
 
 void setup() {
@@ -69,14 +69,14 @@ void setup() {
   Serial.begin(9600);                         // Serial (comm ard-lcd)
   state = TEAM_CHOICE;                        // Statemachine
   pinMode(start_switch_PIN, INPUT_PULLUP);    // Starter_switch
-  sonarSensorN.setup(150);                       // Sonar sensor
-  sonarSensorW.setup(150);
-  sonarSensorE.setup(150);
-  sonarSensorS.setup(150);
-  sonarSensorNW.setup(150);
-  sonarSensorNE.setup(150);
-  sonarSensorSW.setup(150);
-  sonarSensorSE.setup(150);
+  sonarSensorN.setup(150,750);                       // Sonar sensor
+  sonarSensorW.setup(150,750);
+  sonarSensorE.setup(150,750);
+  sonarSensorS.setup(150,750);
+  sonarSensorNW.setup(150,750);
+  sonarSensorNE.setup(150,750);
+  sonarSensorSW.setup(150,750);
+  sonarSensorSE.setup(150,750);
   timeLastDebug = millis();
 }
 
@@ -107,12 +107,14 @@ void loop() {
       timeNow = millis()-timeStartRUN;
         if (sonarSensorN.detection() || sonarSensorW.detection() || sonarSensorE.detection() ||sonarSensorS.detection() ||sonarSensorNE.detection() ||sonarSensorNW.detection() ||sonarSensorSE.detection()||sonarSensorSW.detection()) {
           Movement::stopMovement();
-          state = HOMOLOGATION;
+          state = DETECTION;
         }
         else{
           strategy.play();
         }
+        /*
         if(millis()-timeLastDebug >= timeToUpdateDebug){
+            Serial.println("---RUN---");
             Serial.print("Distance N: ");
             Serial.println(sonarSensorN.getDistance());
             Serial.print("Distance E: ");
@@ -130,15 +132,17 @@ void loop() {
             Serial.print("Distance SW: ");
             Serial.println(sonarSensorSW.getDistance());
             timeLastDebug = millis();
-          }
+          }*/
       break;
     }
-    case HOMOLOGATION:
+    case DETECTION:
     {
       if (!(sonarSensorN.detection() || sonarSensorW.detection() || sonarSensorE.detection() ||sonarSensorS.detection() ||sonarSensorNE.detection() ||sonarSensorNW.detection() ||sonarSensorSE.detection()||sonarSensorSW.detection())){
         state = RUN;
       }
+      /*
       if(millis()-timeLastDebug >= timeToUpdateDebug){
+        Serial.println("--STOP--");
           Serial.print("Distance N: ");
           Serial.println(sonarSensorN.getDistance());
           Serial.print("Distance E: ");
@@ -157,13 +161,13 @@ void loop() {
           Serial.println(sonarSensorSW.getDistance());
           timeLastDebug = millis();
           }
+          */
       break;
     }
     case END:
     {
       Movement::stopMovement();
       state = TEAM_CHOICE;
-      // Serial.println("END");
       break;
     }
   }
