@@ -84,14 +84,12 @@ bool LineFollower::followingLine(){
 }
 void LineFollower::followingLine_RUN(bool detectionLeft,bool detectionRigth){
   if(detectionLeft and detectionRigth){
-    Serial.println("Double detect");
     timer.setTimer(timeToEnd);
     state_line = DOUBLE_DETECT;
     Movement::forward();
   }
   else if( (detect_main_Right and detectionRigth) or (!detect_main_Right and detectionLeft))
   {
-    Serial.println("rotation");
     rotation();
   }
   else{
