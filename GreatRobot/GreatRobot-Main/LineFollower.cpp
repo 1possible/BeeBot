@@ -2,16 +2,13 @@
 #include "LineFollower.h"
 
 // MARK: Constructor
-LineFollower::LineFollower(int IR_left_pin,int IR_right_pin) {
-  // Initialization code, if needed
-  IR_left_PIN = IR_left_pin;
-  IR_right_PIN = IR_right_pin;
+LineFollower::LineFollower(int IR_left_pin,int IR_right_pin): IRsensorLeft(IR_left_pin),IRsensorRight(IR_right_pin) {
 }
 
 // MARK: LifeCycle
 void LineFollower::setup() {
-  pinMode(IR_left_PIN, INPUT);
-  pinMode(IR_right_PIN, INPUT);
+  IRsensorLeft.setup(0);
+  IRsensorRight.setup(0);
   detect_main_Right = true;
   rotation_Right = true;
   timer.setup();
@@ -21,16 +18,18 @@ void LineFollower::setTeam(int team){
   if(team ==1){
     detect_main_Right = true;
     rotation_Right = true;
+    IRsensorLeft.setHoldTime(200);
   }else{
     detect_main_Right = false;
     rotation_Right = false;
+    IRsensorRight.setHoldTime(200);
   }
   
 }
 bool LineFollower::followingLine(){
   bool endLine = false;
-  bool detectionLeft = digitalRead(IR_left_PIN);
-  bool detectionRigth = digitalRead(IR_right_PIN);
+  bool detectionLeft = IRsensorLeft.detection();
+  bool detectionRigth = IRsensorRight.detection();
   switch(state_line){
     case RUN:
     {
@@ -39,10 +38,11 @@ bool LineFollower::followingLine(){
     }
     case DOUBLE_DETECT:
     {
-      if(detectionLeft == LOW or detectionRigth == LOW){
+      if(!detectionLeft or !detectionRigth){
         if(timer.endOfTimer()){
           state_line = END;
-        }else{
+        }
+        else{
           state_line = RETURN_TO_LINE_1;
         }
       }
@@ -54,7 +54,7 @@ bool LineFollower::followingLine(){
     }
     case RETURN_TO_LINE_1:
     {
-      if((detect_main_Right and detectionRigth == HIGH) or (!detect_main_Right and detectionLeft == HIGH))
+      if((detect_main_Right and detectionRigth) or (!detect_main_Right and detectionLeft))
       {
         state_line = RETURN_TO_LINE_2;
       }
@@ -63,7 +63,7 @@ bool LineFollower::followingLine(){
     }
     case RETURN_TO_LINE_2:
     {
-      if((detect_main_Right and detectionRigth == LOW) or (!detect_main_Right and detectionLeft == LOW))
+      if((detect_main_Right and !detectionRigth) or (!detect_main_Right and !detectionLeft))
       {
         state_line = RUN;
       }
@@ -83,13 +83,15 @@ bool LineFollower::followingLine(){
   return endLine;
 }
 void LineFollower::followingLine_RUN(bool detectionLeft,bool detectionRigth){
-  if(detectionLeft == HIGH and detectionRigth == HIGH){
+  if(detectionLeft and detectionRigth){
+    Serial.println("Double detect");
     timer.setTimer(timeToEnd);
     state_line = DOUBLE_DETECT;
     Movement::forward();
   }
-  else if( (detect_main_Right and detectionRigth == HIGH) or (!detect_main_Right and detectionLeft == HIGH))
+  else if( (detect_main_Right and detectionRigth) or (!detect_main_Right and detectionLeft))
   {
+    Serial.println("rotation");
     rotation();
   }
   else{
@@ -97,14 +99,7 @@ void LineFollower::followingLine_RUN(bool detectionLeft,bool detectionRigth){
   }
 
 }
-/*void LineFollower::followingLine_DOUBLE_DETECT(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor){
-}
-void LineFollower::followingLine_RETURN_TO_LINE_1(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor){
-}
-void LineFollower::followingLine_RETURN_TO_LINE_2(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor){
-}
-void LineFollower::followingLine_END(Adafruit_DCMotor *LeftMotor,Adafruit_DCMotor *RightMotor){
-}*/
+
 void LineFollower::rotation(){
   if(rotation_Right){
     Movement::turnRight();
