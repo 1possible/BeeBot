@@ -4,7 +4,6 @@
 #include "CommunicationArduinoLCD.h"
 #include "Motor.h"
 #include "SonarSensor.h"
-#include "EncoderLogic.h"
 #include "LineFollower.h"
 #include "Movement.h"
 #include "Strategy.h"
