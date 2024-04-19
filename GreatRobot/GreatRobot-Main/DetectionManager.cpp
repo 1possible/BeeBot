@@ -13,14 +13,14 @@ DetectionManager::DetectionManager(SonarSensor* newSonarSensorN, SonarSensor* ne
 }
 
 void DetectionManager::setup(){
-  sonarSensorN->setup(150,750);                       // Sonar sensor
-  sonarSensorW->setup(150,750);
-  sonarSensorE->setup(150,750);
-  sonarSensorS->setup(150,750);
-  sonarSensorNW->setup(150,750);
-  sonarSensorNE->setup(150,750);
-  sonarSensorSW->setup(150,750);
-  sonarSensorSE->setup(150,750);
+  sonarSensorN->setup(200,750);                       // Sonar sensor
+  sonarSensorW->setup(200,750);
+  sonarSensorE->setup(200,750);
+  sonarSensorS->setup(200,750);
+  sonarSensorNW->setup(200,750);
+  sonarSensorNE->setup(200,750);
+  sonarSensorSW->setup(200,750);
+  sonarSensorSE->setup(200,750);
 }
 bool DetectionManager::detection(){
   bool val_detect = false;

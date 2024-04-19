@@ -24,9 +24,9 @@ class Strategy{
     Timer timer;
     const unsigned int STEPFORWARDtime = 1500 ;
     const unsigned int RELEASEPLANTStime = 4500;
-    const unsigned int HARDCODEROT1time = 3000 ;
+    const unsigned int HARDCODEROT1time = 2500 ;
     const unsigned int HARDCODEBACKWARD1time = 12000 ;
-    const unsigned int HARDCODEROT2time = 2000 ;
+    const unsigned int HARDCODEROT2time = 1500 ;
     const unsigned int HARDCODEBACKWARD2time= 18000;
 };
 
