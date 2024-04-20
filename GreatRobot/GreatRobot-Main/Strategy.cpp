@@ -46,6 +46,7 @@ void Strategy::play()
       if(timer.endOfTimer()){
         timer.setTimer(RELEASEPLANTStime);
         strat_state = RELEASE_PLANTS;
+        Serial.println("ckpt:PlantZ");
         //Serial.println("stat start backward");
       }else{
         Movement::forward();
@@ -56,7 +57,6 @@ void Strategy::play()
     {
       if(timer.endOfTimer()){
         timer.setTimer(HARDCODEROT1time);
-        Serial.println("ckpt:PlantZ");
         strat_state = HARDCODE_ROT1;
       }else{
         Movement::backward();
