@@ -18,6 +18,7 @@ void LCDscreen::setup(){
   tft.setRotation(0);            //PORTRAIT
   yellowTeam = true;
   stateScreen = OFF;
+  nbrPlant = 0;
 }
 int LCDscreen::chooseTeamScreen(){
   int val = -1;
@@ -84,6 +85,9 @@ void LCDscreen::setTeam(int team){
     yellowTeam = false;
   }
 }
+void LCDscreen::setNbrPlant(int newNbrPlant){
+  nbrPlant = newNbrPlant;
+}
 bool LCDscreen::Touch_getXY(void)
 {
     TSPoint p = ts.getPoint();
@@ -127,6 +131,11 @@ void LCDscreen::showChooseTeamScreen(){
       tft.setCursor(0, 200);
       tft.setTextColor(WHITE);
       tft.println("Choose a Team");
+      tft.setTextSize(3);
+      tft.setCursor(0, 400);
+      tft.setTextColor(WHITE);
+      tft.print("plant :");
+      tft.println(nbrPlant);
       //button
       red_btn.initButton(&tft,  100, 260, 100, 40, WHITE, CYAN, BLACK, "yellow", 2);
       blue_btn.initButton(&tft, 220, 260, 100, 40, WHITE, CYAN, BLACK, "BLUE", 2);

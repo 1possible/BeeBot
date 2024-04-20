@@ -20,6 +20,7 @@ class LCDscreen {
     int scoreScreen(int Score);
     void setTeam(int team);
     void showScoreScreen(int Score);
+    void setNbrPlant(int newNbrPlant);
   private:
     static const int MINPRESSURE = 200;
     static const int MAXPRESSURE = 1000;
@@ -39,6 +40,7 @@ class LCDscreen {
     static const int TS_LEFT=915,TS_RT=195,TS_TOP=949,TS_BOT=196;
     TouchScreen ts;
     bool yellowTeam;
+    int nbrPlant;
     Adafruit_GFX_Button red_btn, blue_btn, back_btn, pot_0_btn, pot_1_btn, pot_2_btn,pot_3_btn, pot_4_btn;
     int pixel_x, pixel_y;     //Touch_getXY() updates global vars
     enum {OFF, CHOOSE_PLANT_SCREEN, CHOOSE_TEAM_SCREEN , SCORE_SCREEN} stateScreen ;
