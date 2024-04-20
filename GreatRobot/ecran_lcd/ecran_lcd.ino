@@ -26,6 +26,7 @@ void loop(void)
       btn_val = screen.choosePlantsScreen();
       if(btn_val != -1){
         scoreCal.setNbrPlant(btn_val);
+        screen.setNbrPlant(btn_val);
         state = CHOOSE_TEAM;
       }
       break;   
@@ -35,6 +36,7 @@ void loop(void)
       btn_val = screen.chooseTeamScreen();
       if(btn_val != -1){
         screen.setTeam(btn_val);
+        scoreCal.addPAMIToScore();
         commArd.sendTeam(String(btn_val));
         state = SCORE;
       }
