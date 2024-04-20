@@ -107,6 +107,7 @@ void loop() {
         else{
           strategy.play();
         }
+        /*
         if(millis()-timeLastDebug >= timeToUpdateDebug){
             Serial.println("---RUN---");
             Serial.print("Distance N: ");
@@ -126,7 +127,7 @@ void loop() {
             Serial.print("Distance SW: ");
             Serial.println(sonarSensorSW.getDistance());
             timeLastDebug = millis();
-          }
+          }*/
       break;
     }
     case DETECTION:
@@ -135,6 +136,7 @@ void loop() {
         state = RUN;
         strategy.activateTimer();
       }
+      /*
       if(millis()-timeLastDebug >= timeToUpdateDebug){
         Serial.println("--STOP--");
           Serial.print("Distance N: ");
@@ -155,6 +157,7 @@ void loop() {
           Serial.println(sonarSensorSW.getDistance());
           timeLastDebug = millis();
           }
+          */
       break;
     }
     case END:
