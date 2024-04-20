@@ -24,7 +24,17 @@ void DetectionManager::setup(){
 }
 bool DetectionManager::detection(){
   bool val_detect = false;
-  if (sonarSensorN->detection() || sonarSensorW->detection() || sonarSensorE->detection() ||sonarSensorS->detection() ||sonarSensorNE->detection() ||sonarSensorNW->detection() ||sonarSensorSE->detection()||sonarSensorSW->detection()) {
+  if ( Movement::moveState == Movement::MV_FORWARD ){
+    if(sonarSensorN->detection()||sonarSensorNE->detection()||sonarSensorNW->detection()){
+      //sonarSensorN->detection() || sonarSensorW->detection() || sonarSensorE->detection() ||sonarSensorS->detection() ||sonarSensorNE->detection() ||sonarSensorNW->detection() ||sonarSensorSE->detection()||sonarSensorSW->detection()) {
+      val_detect = true;
+    }
+  }
+  else if( Movement::moveState ==  Movement::MV_BACKWARD ){
+    if(sonarSensorS->detection()||sonarSensorSE->detection()||sonarSensorSW->detection()){
+      val_detect = true;
+    }
+  }else if(sonarSensorN->detection() || sonarSensorW->detection() || sonarSensorE->detection() ||sonarSensorS->detection() ||sonarSensorNE->detection() ||sonarSensorNW->detection() ||sonarSensorSE->detection()||sonarSensorSW->detection()){
     val_detect = true;
   }
   return val_detect;

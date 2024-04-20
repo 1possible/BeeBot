@@ -18,11 +18,11 @@ void LineFollower::setTeam(int team){
   if(team ==1){
     detect_main_Right = true;
     rotation_Right = true;
-    IRsensorLeft.setHoldTime(200);
+    IRsensorLeft.setHoldTime(10);
   }else{
     detect_main_Right = false;
     rotation_Right = false;
-    IRsensorRight.setHoldTime(200);
+    IRsensorRight.setHoldTime(10);
   }
   
 }

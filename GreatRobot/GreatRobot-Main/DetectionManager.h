@@ -1,6 +1,7 @@
 #ifndef DETECTION_MANAGER_H
 #define DETECTION_MANAGER_H
 #include "SonarSensor.h"
+#include "Movement.h"
 #include <Arduino.h>
 
 class DetectionManager {
@@ -19,5 +20,4 @@ SonarSensor* sonarSensorNE;
 SonarSensor* sonarSensorSW;
 SonarSensor* sonarSensorSE;
 };
-
 #endif

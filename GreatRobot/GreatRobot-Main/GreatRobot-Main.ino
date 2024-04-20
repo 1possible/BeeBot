@@ -64,6 +64,7 @@ enum { TEAM_CHOICE, WAIT, RUN, DETECTION, END} state;
 
 void setup() {
   motor.setupMotors();                        // Motor    
+  Movement::setup();
   lineFollower.setup();                       // Line follower IR
   Serial.begin(9600);                         // Serial (comm ard-lcd)
   state = TEAM_CHOICE;                        // Statemachine
@@ -106,7 +107,6 @@ void loop() {
         else{
           strategy.play();
         }
-        /*
         if(millis()-timeLastDebug >= timeToUpdateDebug){
             Serial.println("---RUN---");
             Serial.print("Distance N: ");
@@ -126,7 +126,7 @@ void loop() {
             Serial.print("Distance SW: ");
             Serial.println(sonarSensorSW.getDistance());
             timeLastDebug = millis();
-          }*/
+          }
       break;
     }
     case DETECTION:
@@ -135,7 +135,6 @@ void loop() {
         state = RUN;
         strategy.activateTimer();
       }
-      /*
       if(millis()-timeLastDebug >= timeToUpdateDebug){
         Serial.println("--STOP--");
           Serial.print("Distance N: ");
@@ -156,7 +155,6 @@ void loop() {
           Serial.println(sonarSensorSW.getDistance());
           timeLastDebug = millis();
           }
-          */
       break;
     }
     case END:
