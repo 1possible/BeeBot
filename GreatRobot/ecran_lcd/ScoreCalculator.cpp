@@ -16,7 +16,7 @@ void ScoreCalculator::addOneSonarPanelToScore(){
   score += pts_per_SolarPanel;
 }
 void ScoreCalculator::addPlantToScore(){
-  score += nbrPlant * pts_per_plants;
+  score += nbrPlant * pts_per_plants + pts_per_PAMI_PLANTS;
 }
 void ScoreCalculator::addPAMIToScore(){
   score += 2 * pts_per_PAMI;
