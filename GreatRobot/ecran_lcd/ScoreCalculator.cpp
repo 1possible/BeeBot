@@ -19,7 +19,7 @@ void ScoreCalculator::addPlantToScore(){
   score += nbrPlant * pts_per_plants;
 }
 void ScoreCalculator::addPAMIToScore(){
-  score += 1 * pts_per_PAMI;
+  score += 2 * pts_per_PAMI;
 }
 void ScoreCalculator::addFinalZone(){
   score += pts_final_zone;
