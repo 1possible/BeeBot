@@ -26,7 +26,7 @@ class Strategy{
     const unsigned int RELEASEPLANTStime = 4500;
     const unsigned int HARDCODEROT1time = 3000 ;
     const unsigned int HARDCODEBACKWARD1time = 12000 ;
-    const unsigned int HARDCODEROT2time = 1000 ;
+    const unsigned int HARDCODEROT2time = 1250 ;
     const unsigned int HARDCODEBACKWARD2time= 17000;
 };
 

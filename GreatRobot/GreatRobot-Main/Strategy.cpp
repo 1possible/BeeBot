@@ -129,5 +129,10 @@ void Strategy::disableTimer(){
   timer.disable();
   if(strat_state == FOLLOW_LINE){
     lineFollower->disableTimer();
+  }else if(strat_state == STEP_FORWARD){
+    timer.setTimer(RELEASEPLANTStime);
+    strat_state = RELEASE_PLANTS;
+    Serial.println("ckpt:PlantZ");
+    Movement::moveState = Movement::MV_BACKWARD;
   }
 }
