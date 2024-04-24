@@ -5,6 +5,9 @@ Strategy::Strategy(LineFollower * lineFollower_PARAM)
   lineFollower = lineFollower_PARAM;
   strat_state = START;
 }
+void Strategy::setup(){
+  timer.setup();
+}
 void Strategy::setTeam(int newTeam){
    if (newTeam == 1)
    {
@@ -33,29 +36,64 @@ void Strategy::play()
     {
       bool endline =lineFollower->followingLine();
       if(endline){
-        timeStartStep= millis();
+        timer.setTimer(STEPFORWARDtime);
         strat_state = STEP_FORWARD;
       }
       break;
     }
     case STEP_FORWARD:
     {
-      if(millis()-timeStartStep > 1000){
-        timeStartStep= millis();
-        strat_state = STEP_ROT;
+      if(timer.endOfTimer()){
+        timer.setTimer(RELEASEPLANTStime);
+        strat_state = RELEASE_PLANTS;
+        Serial.println("ckpt:PlantZ");
         //Serial.println("stat start backward");
       }else{
         Movement::forward();
       }
       break;
     }
-    case STEP_ROT:
+    case RELEASE_PLANTS:
     {
-      if(millis()-timeStartStep > 4000){
-        timeStartStep= millis();
-        strat_state = RETURN_TO_BASE;
+      if(timer.endOfTimer()){
+        timer.setTimer(HARDCODEROT1time);
+        strat_state = HARDCODE_ROT1;
       }else{
-        if(teamYellow){ 
+        Movement::backward();
+      }
+      break;
+    }
+    case HARDCODE_ROT1:
+    {
+      if(timer.endOfTimer()){
+        timer.setTimer(HARDCODEBACKWARD1time);
+        strat_state = HARDCODE_BACKWARD1;
+      }else{
+        if(teamYellow){
+          Movement::turnLeft();
+        }else{
+          Movement::turnRight();
+        }
+      }
+      break;
+    }
+    case HARDCODE_BACKWARD1:
+    {
+      if(timer.endOfTimer()){
+        timer.setTimer(HARDCODEROT2time);
+        strat_state = HARDCODE_ROT2;
+      }else{
+        Movement::backward();
+      }
+      break;
+    }
+    case HARDCODE_ROT2:
+    {
+      if(timer.endOfTimer()){
+        timer.setTimer(HARDCODEBACKWARD2time);
+        strat_state = HARDCODE_BACKWARD2;
+      }else{
+        if(teamYellow){
           Movement::turnRight();
         }else{
           Movement::turnLeft();
@@ -63,20 +101,38 @@ void Strategy::play()
       }
       break;
     }
-    case RETURN_TO_BASE:
+    case HARDCODE_BACKWARD2:
     {
-      if(millis()-timeStartStep > 20000){
-        timeStartStep= millis();
+      if(timer.endOfTimer()){
+        Serial.println("ckpt:FZ");
         strat_state = END;
       }else{
         Movement::backward();
       }
       break;
     }
+    
     case END:
     {
       Movement::stopMovement();
       break;
     }
+  }
+}
+void Strategy::activateTimer(){
+  timer.activate();
+  if(strat_state == FOLLOW_LINE){
+    lineFollower->activateTimer();
+  }
+}
+void Strategy::disableTimer(){
+  timer.disable();
+  if(strat_state == FOLLOW_LINE){
+    lineFollower->disableTimer();
+  }else if(strat_state == STEP_FORWARD){
+    timer.setTimer(RELEASEPLANTStime);
+    strat_state = RELEASE_PLANTS;
+    Serial.println("ckpt:PlantZ");
+    Movement::moveState = Movement::MV_BACKWARD;
   }
 }
