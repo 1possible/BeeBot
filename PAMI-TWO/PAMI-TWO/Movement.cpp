@@ -17,10 +17,5 @@ void Movement::turnLeft() {
 }
 
 void Movement::forward() {
-  motor.controlMotors(HIGH_SPEED - 2, HIGH_SPEED, FORWARD, FORWARD);
-}
-
-void Movement::backward() {
-  motor.controlMotors(HIGH_SPEED, HIGH_SPEED, BACKWARD, BACKWARD);
-  moveState= MV_BACKWARD;
+  motor.controlMotors(HIGH_SPEED - 2, HIGH_SPEED, FORWARD, FORWARD);   // -2 because left and right motor are a bit different
 }

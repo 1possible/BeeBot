@@ -18,6 +18,5 @@ class Motor {
     void stopMotors();
 };
 
-extern const uint8_t LOW_SPEED;
 extern const uint8_t HIGH_SPEED;
 #endif

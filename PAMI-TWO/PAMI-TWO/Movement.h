@@ -14,7 +14,6 @@ public:
   static void turnRight();
   static void turnLeft();
   static void forward();
-  static void backward();
 };
 
 extern int notTurn;
