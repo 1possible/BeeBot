@@ -11,7 +11,7 @@ const byte ECHO_PIN = 6;
 
 
 // DEFINE CONSTANTS    
-const uint8_t HIGH_SPEED = 194;       // motor speeds   // befor Left at 194 and right at 196
+const uint8_t HIGH_SPEED = 194;       // motor speed   // befor Left at 194 and right at 196
 unsigned long timeLine =0;
 unsigned long timeStartPlay;
 bool groupIsBlue;
@@ -44,7 +44,7 @@ void loop() {
         // Configuration for team colors 
         if (digitalRead(switchGroup) == HIGH){
           groupIsBlue = true;
-          Serial.println("Blue  group"); 
+          Serial.println("Blue group"); 
           }
         else{
           groupIsBlue = false;
@@ -57,11 +57,20 @@ void loop() {
       break;
 
     case RUN:
-      if (sonarSensor.obstacleInTheWay() && timeNow() <= 8500) {
-        state = END;
+      unsigned long timeNow = millis() - timeStartPlay;
+      if (timeNow <= 8500) {
+        if (sonarSensor.obstacleInTheWay()){
+          state = END;
+        }
+        else {
+          Movement::forward();
+          if (notTurn <=1 && (timeNow >= 3600)){
+            state = TURN;
+          }
+        }
       }
-      else if (notTurn <=1 && (timeNow() >= 3600)){
-        state = TURN;
+      else {
+        state = END;
       }
       break;
 
@@ -86,10 +95,6 @@ void loop() {
 }
 
 
-long timeNow(){
-  unsigned long timeNow = millis() - timeStartPlay;
-  return timeNow;
-}
 
 
 
