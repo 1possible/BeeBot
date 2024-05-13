@@ -1,11 +1,5 @@
 //GreatRobot code
-#include <Wire.h>
-#include <Arduino.h>
 #include "CommunicationArduinoLCD.h"
-#include "Motor.h"
-#include "SonarSensor.h"
-#include "LineFollower.h"
-#include "Movement.h"
 #include "Strategy.h"
 #include "DetectionManager.h"
 // DEFINE PINS
@@ -88,6 +82,7 @@ void loop() {
       }
       break;
     }
+
     case WAIT :
     {
       if(digitalRead(start_switch_PIN)==HIGH){
@@ -96,6 +91,7 @@ void loop() {
       break;
       
     }
+    
     case RUN:
     {
       timeNow = millis()-timeStartRUN;
@@ -107,59 +103,18 @@ void loop() {
         else{
           strategy.play();
         }
-        /*
-        if(millis()-timeLastDebug >= timeToUpdateDebug){
-            Serial.println("---RUN---");
-            Serial.print("Distance N: ");
-            Serial.println(sonarSensorN.getDistance());
-            Serial.print("Distance E: ");
-            Serial.println(sonarSensorE.getDistance());
-            Serial.print("Distance W: ");
-            Serial.println(sonarSensorW.getDistance());
-            Serial.print("Distance S: ");
-            Serial.println(sonarSensorS.getDistance());
-            Serial.print("Distance NE: ");
-            Serial.println(sonarSensorNE.getDistance());
-            Serial.print("Distance NW: ");
-            Serial.println(sonarSensorNW.getDistance());
-            Serial.print("Distance SE: ");
-            Serial.println(sonarSensorSE.getDistance());
-            Serial.print("Distance SW: ");
-            Serial.println(sonarSensorSW.getDistance());
-            timeLastDebug = millis();
-          }*/
       break;
     }
+
     case DETECTION:
     {
       if (!detectionManager.detection()){
         state = RUN;
         strategy.activateTimer();
       }
-      /*
-      if(millis()-timeLastDebug >= timeToUpdateDebug){
-        Serial.println("--STOP--");
-          Serial.print("Distance N: ");
-          Serial.println(sonarSensorN.getDistance());
-          Serial.print("Distance E: ");
-          Serial.println(sonarSensorE.getDistance());
-          Serial.print("Distance W: ");
-          Serial.println(sonarSensorW.getDistance());
-          Serial.print("Distance S: ");
-          Serial.println(sonarSensorS.getDistance());
-          Serial.print("Distance NE: ");
-          Serial.println(sonarSensorNE.getDistance());
-          Serial.print("Distance NW: ");
-          Serial.println(sonarSensorNW.getDistance());
-          Serial.print("Distance SE: ");
-          Serial.println(sonarSensorSE.getDistance());
-          Serial.print("Distance SW: ");
-          Serial.println(sonarSensorSW.getDistance());
-          timeLastDebug = millis();
-          }
-          */
       break;
     }
+
     case END:
     {
       Movement::stopMovement();
