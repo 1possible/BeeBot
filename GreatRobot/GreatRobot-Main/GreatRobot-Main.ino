@@ -1,6 +1,4 @@
 //GreatRobot code
-#include <Wire.h>
-#include <Arduino.h>
 #include "CommunicationArduinoLCD.h"
 #include "Motor.h"
 #include "SonarSensor.h"
@@ -88,6 +86,7 @@ void loop() {
       }
       break;
     }
+
     case WAIT :
     {
       if(digitalRead(start_switch_PIN)==HIGH){
@@ -96,6 +95,7 @@ void loop() {
       break;
       
     }
+    
     case RUN:
     {
       timeNow = millis()-timeStartRUN;
@@ -160,6 +160,7 @@ void loop() {
           */
       break;
     }
+
     case END:
     {
       Movement::stopMovement();
