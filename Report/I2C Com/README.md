@@ -17,7 +17,7 @@ Les connexions I2C doivent être effectuées comme suit :
 3. **SCL de l'Arduino (A5)** connecté au **SCL de l'ESP32 (GPIO22)**
 
 ![Schéma de connexion (src:https://docs.arduino.cc/learn/communication/wire/ )](image/image.png)
-* dans le schema ci-dessous il est facile de remplacer l'un des deux arduinos par un esp32 (ou n'importe quelle autre board utilisant I2C, à condition de bien verifier dans la datsheet quelles pins sont SDA et SCL)*
+_dans le schema ci-dessous il est facile de remplacer l'un des deux arduinos par un esp32 (ou n'importe quelle autre board utilisant I2C, à condition de bien verifier dans la datsheet quelles pins sont SDA et SCL)_
 ## Configuration logicielle
 
 ### Code pour l'Arduino (Maître)
