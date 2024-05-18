@@ -2,6 +2,7 @@
 #define Communication_Arduino_H
 #include "Arduino.h"
 #include "ScoreCalculator.h"
+#include <ArduinoLog.h>
 
 class CommunicationArduino {
   public:

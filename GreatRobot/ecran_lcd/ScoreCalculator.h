@@ -1,5 +1,6 @@
 #ifndef SCORE_CALCULATOR_H
 #define SCORE_CALCULATOR_H
+#include <ArduinoLog.h>
 
 class ScoreCalculator {
   public:

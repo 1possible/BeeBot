@@ -3,6 +3,7 @@
 #include <Adafruit_GFX.h>
 #include <MCUFRIEND_kbv.h>
 #include <TouchScreen.h>
+#include <ArduinoLog.h>
 #define BLACK   0x0000
 #define BLUE    0x001F
 #define RED     0xF800

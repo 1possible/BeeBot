@@ -1,15 +1,7 @@
 #include "lcd_screen.h"
 
-LCDscreen::LCDscreen(): ts(XP, YP, XM, YM, 300){
-  //ts = TouchScreen(XP, YP, XM, YM, 300);
-  /*
-  uint16_t ID = tft.readID();
-  if (ID == 0xD3D3) ID = 0x9486; // write-only shield
-  tft.begin(ID);
-  tft.setRotation(0);            //PORTRAIT
-  yellowTeam = true;
-  stateScreen = OFF;*/
-}
+LCDscreen::LCDscreen(): ts(XP, YP, XM, YM, 300){}
+
 void LCDscreen::setup(){
   //ts = TouchScreen(XP, YP, XM, YM, 300);
   uint16_t ID = tft.readID();
@@ -20,6 +12,7 @@ void LCDscreen::setup(){
   stateScreen = OFF;
   nbrPlant = 0;
 }
+
 int LCDscreen::chooseTeamScreen(){
   int val = -1;
   if( stateScreen!= CHOOSE_TEAM_SCREEN){
@@ -36,6 +29,7 @@ int LCDscreen::chooseTeamScreen(){
   }
   return val;
 }
+
 int LCDscreen::choosePlantsScreen(){
   int val = -1;
   if(stateScreen != CHOOSE_PLANT_SCREEN){
@@ -64,6 +58,7 @@ int LCDscreen::choosePlantsScreen(){
   }
   return val;
 }
+
 int LCDscreen::scoreScreen(int Score){
   int val = -1;
   if(stateScreen != SCORE_SCREEN){
@@ -78,72 +73,83 @@ int LCDscreen::scoreScreen(int Score){
       }
   return val;
 }
+
 void LCDscreen::setTeam(int team){
   if(team == 1){
+    Log.trace("LCD : set team on YELLOW" CR);
     yellowTeam = true;
   }else{
+    Log.trace("LCD : set team on BLUE" CR);
     yellowTeam = false;
   }
 }
 void LCDscreen::setNbrPlant(int newNbrPlant){
   nbrPlant = newNbrPlant;
+  Log.trace("LCD : set plant number to %d" CR, nbrPlant);
 }
+
 bool LCDscreen::Touch_getXY(void)
 {
-    TSPoint p = ts.getPoint();
-    pinMode(YP, OUTPUT);      //restore shared pins
-    pinMode(XM, OUTPUT);
-    digitalWrite(YP, HIGH);   //because TFT control pins
-    digitalWrite(XM, HIGH);
-    bool pressed = (p.z > MINPRESSURE && p.z < MAXPRESSURE);
-    if (pressed) {
-        pixel_x = map(p.x, TS_LEFT, TS_RT, 0, tft.width()); //.kbv makes sense to me
-        pixel_y = map(p.y, TS_TOP, TS_BOT, 0, tft.height());
-    }
-    return pressed;
+  TSPoint p = ts.getPoint();
+  pinMode(YP, OUTPUT);      //restore shared pins
+  pinMode(XM, OUTPUT);
+  digitalWrite(YP, HIGH);   //because TFT control pins
+  digitalWrite(XM, HIGH);
+  bool pressed = (p.z > MINPRESSURE && p.z < MAXPRESSURE);
+  if (pressed) {
+    pixel_x = map(p.x, TS_LEFT, TS_RT, 0, tft.width()); //.kbv makes sense to me
+    pixel_y = map(p.y, TS_TOP, TS_BOT, 0, tft.height());
+  }
+  return pressed;
 }
+
 void LCDscreen::showChoosePlantScreen(){
-      tft.fillScreen(BLACK);
-      //print message
-      tft.setTextSize(4);
-      tft.setCursor(50, 100);
-      tft.setTextColor(WHITE);
-      tft.println("number of");
-      tft.setCursor(100, 130);
-      tft.println("plant");
-      //button
-      pot_1_btn.initButton(&tft,  100, 220, 100, 40, WHITE, CYAN, BLACK, "1", 2);
-      pot_2_btn.initButton(&tft,  220, 220, 100, 40, WHITE, CYAN, BLACK, "2", 2);
-      pot_3_btn.initButton(&tft,  100, 270, 100, 40, WHITE, CYAN, BLACK, "3", 2);
-      pot_4_btn.initButton(&tft,  220, 270, 100, 40, WHITE, CYAN, BLACK, "4", 2);
-      pot_0_btn.initButton(&tft,  160, 320, 100, 40, WHITE, CYAN, BLACK, "0", 2);
-      pot_0_btn.drawButton(false);
-      pot_1_btn.drawButton(false);
-      pot_2_btn.drawButton(false);
-      pot_3_btn.drawButton(false);
-      pot_4_btn.drawButton(false);
-      stateScreen = CHOOSE_PLANT_SCREEN;
+  Log.trace("LCD : show the plant number selection screen on LCD" CR);
+  tft.fillScreen(BLACK);
+  //print message
+  tft.setTextSize(4);
+  tft.setCursor(50, 100);
+  tft.setTextColor(WHITE);
+  tft.println("number of");
+  tft.setCursor(100, 130);
+  tft.println("plant");
+  //button
+  pot_1_btn.initButton(&tft,  100, 220, 100, 40, WHITE, CYAN, BLACK, "1", 2);
+  pot_2_btn.initButton(&tft,  220, 220, 100, 40, WHITE, CYAN, BLACK, "2", 2);
+  pot_3_btn.initButton(&tft,  100, 270, 100, 40, WHITE, CYAN, BLACK, "3", 2);
+  pot_4_btn.initButton(&tft,  220, 270, 100, 40, WHITE, CYAN, BLACK, "4", 2);
+  pot_0_btn.initButton(&tft,  160, 320, 100, 40, WHITE, CYAN, BLACK, "0", 2);
+  pot_0_btn.drawButton(false);
+  pot_1_btn.drawButton(false);
+  pot_2_btn.drawButton(false);
+  pot_3_btn.drawButton(false);
+  pot_4_btn.drawButton(false);
+  stateScreen = CHOOSE_PLANT_SCREEN;
 }
+
 void LCDscreen::showChooseTeamScreen(){
-      tft.fillScreen(BLACK);
-      //print message
-      tft.setTextSize(4);
-      tft.setCursor(0, 200);
-      tft.setTextColor(WHITE);
-      tft.println("Choose a Team");
-      tft.setTextSize(3);
-      tft.setCursor(0, 400);
-      tft.setTextColor(WHITE);
-      tft.print("plant :");
-      tft.println(nbrPlant);
-      //button
-      red_btn.initButton(&tft,  100, 260, 100, 40, WHITE, CYAN, BLACK, "yellow", 2);
-      blue_btn.initButton(&tft, 220, 260, 100, 40, WHITE, CYAN, BLACK, "BLUE", 2);
-      red_btn.drawButton(false);
-      blue_btn.drawButton(false);
-      stateScreen = CHOOSE_TEAM_SCREEN;
+  Log.trace("LCD : show the team selection screen on LCD" CR);
+  tft.fillScreen(BLACK);
+  //print message
+  tft.setTextSize(4);
+  tft.setCursor(0, 200);
+  tft.setTextColor(WHITE);
+  tft.println("Choose a Team");
+  tft.setTextSize(3);
+  tft.setCursor(0, 400);
+  tft.setTextColor(WHITE);
+  tft.print("plant :");
+  tft.println(nbrPlant);
+   //button
+  red_btn.initButton(&tft,  100, 260, 100, 40, WHITE, CYAN, BLACK, "yellow", 2);
+  blue_btn.initButton(&tft, 220, 260, 100, 40, WHITE, CYAN, BLACK, "BLUE", 2);
+  red_btn.drawButton(false);
+  blue_btn.drawButton(false);
+  stateScreen = CHOOSE_TEAM_SCREEN;
 }
+
 void LCDscreen::showScoreScreen(int Score){
+  Log.trace("LCD : show the score screen on LCD" CR);
   if(yellowTeam){
     tft.fillScreen(YELLOW);
     tft.setTextColor(BLACK);
