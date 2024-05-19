@@ -36,8 +36,8 @@ Les images ci-dessous montrent les connexions des capteurs IR et des LEDs à l'A
 _Figure 1: Connexion du capteur IR à l'Arduino_
 
 ![Schéma de connexion (src:https://www.robot-maker.com/ouvrages/2-3-allumer-une-led/)](images/led.png)
-_Figure 2: Connexion des LEDs à l'Arduino_
-_Notons ici que nous n'avons pas besoin de manipuler l'etat des leds par conséquent elles seront directement mises sur les bornes positive et négative._
+_Figure 2: Connexion des LEDs à l'Arduino._
+- _Notons ici que nous n'avons pas besoin de manipuler l'etat des leds dans le cadre de ce projetpar conséquent elles seront directement mises sur les bornes positive et négative._
 
 ## Explication du code 
 ### Déclaration des Broches et des Instances de Classes
@@ -146,7 +146,7 @@ bool LineFollower::followingLine() {
   return false;
 }
 ```
-**void LineFollower::followingLine_RUN(bool detectionLeft, bool detectionRigth) :**Méthode pour ajuster la direction du robot en function des detections des capteurs. Si les deux capteurs détectent la ligne, le robot avance. Si un seul capteur détecte la ligne, le robot tourne dans la direction appropriée.
+**void LineFollower::followingLine_RUN(bool detectionLeft, bool detectionRigth):** Méthode pour ajuster la direction du robot en function des detections des capteurs. Si les deux capteurs détectent la ligne, le robot avance. Si un seul capteur détecte la ligne, le robot tourne dans la direction appropriée.
 ```cpp
 void LineFollower::followingLine_RUN(bool detectionLeft, bool detectionRigth) {
   if (detectionLeft && detectionRigth) {
