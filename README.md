@@ -8,6 +8,7 @@
     * [Frameworks](#zap-frameworks)
     * [Class diagram](#seedling-class-diagram)
     * [state machine](#seedling-great-robot-state-machine)
+    * [unit test](#unit-test)
 ## **Project participants**
 
 ### 2023-24
@@ -21,7 +22,9 @@
 
 ## :question: About the project
 
+This project was made as part of the eurobot 2024 competition.
 The purpose of this project is create a robot that will be able to take the plants and put them in a greenhousse before going to the last greenhouse to "recharge" the robot.
+This robot will also be accompanied by 2 PAMI (PAMI-ONE and PAMI-TWO).
 
 ## :rocket: Getting started
 
@@ -54,3 +57,11 @@ For Unit test:
 ![FSM_greatRobot_Strategy](assets/images/FSM_strategy.png)
 #### state of the "LineFollower"
 ![FSM_greatRobot_LineFollower](assets/images/FSM_LineFollower.png)
+
+### unit test
+
+The unit test can be performed directly on an Arduino board. It is uploaded to the board just like classic arduino code. The result of the unit test will be sent by serial.
+
+unit test :[here](GreatRobot\unit-tests)
+
+troubleshooting: during compilation, it may not see the class file to be tested. This can be resolved by replacing the relative path with its absolute path (for the "include"). 
