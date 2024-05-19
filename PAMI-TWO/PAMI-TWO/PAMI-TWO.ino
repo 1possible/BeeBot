@@ -36,7 +36,6 @@ void setup() {
   state = WAIT;
 }
 
-
 void loop() {
   switch(state){
     case WAIT:
@@ -55,7 +54,6 @@ void loop() {
         state = TURN;
       }
       break;
-
     case RUN:
       unsigned long timeNow = millis() - timeStartPlay;
       if (timeNow <= 8500) {
@@ -93,10 +91,6 @@ void loop() {
       break;
   }
 }
-
-
-
-
 
 // bug actuellement : 1. lorsque l'on change de d'équipe alors que le pami n'est pas alimenter celui si en fonction de la position va se metre à changer d'équipe à chaque fois qu'on le rallume et étteint
 //                    2. à environ 4 sec de course l'un des moteurs du robot tourne moins vite que l'autre pendant 0.25s 

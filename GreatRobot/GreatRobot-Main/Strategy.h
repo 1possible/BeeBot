@@ -3,6 +3,7 @@
 #include "LineFollower.h"
 #include "Movement.h"
 #include "Timer.h"
+#include <ArduinoLog.h>
 // MARK: Libraries
 //#include <Arduino.h>
 // #include <Adafruit_MotorShield.h>

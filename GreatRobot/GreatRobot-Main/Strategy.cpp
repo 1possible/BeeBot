@@ -11,12 +11,14 @@ void Strategy::setup(){
 void Strategy::setTeam(int newTeam){
    if (newTeam == 1)
    {
+    Log.trace("Strat : set team on YELLOW" CR);
     teamYellow = true;
     lineFollower->setTeam(1);
    }
    //BLUE TEAM
    else if (newTeam == 2)
    {
+    Log.trace("Strat : set team on BLUE" CR);
     teamYellow = false;
     lineFollower->setTeam(2);
    }
@@ -24,11 +26,13 @@ void Strategy::setTeam(int newTeam){
 void Strategy::play()
 {
   if(strat_state != START && millis()-timeStartSTRAT>= LimitTime){
+    Log.notice("Strat : new state : END" CR);
     strat_state = END; 
   }
   switch(strat_state){
     case START:
     {
+      Log.notice("Strat : new state : FOLLOW_LINE" CR);
       timeStartSTRAT = millis();
       strat_state = FOLLOW_LINE;
     }
@@ -36,6 +40,7 @@ void Strategy::play()
     {
       bool endline =lineFollower->followingLine();
       if(endline){
+        Log.notice("Strat : new state : STEP_FORWARD" CR);
         timer.setTimer(STEPFORWARDtime);
         strat_state = STEP_FORWARD;
       }
@@ -44,6 +49,7 @@ void Strategy::play()
     case STEP_FORWARD:
     {
       if(timer.endOfTimer()){
+        Log.notice("Strat : new state : RELEASE_PLANTS" CR);
         timer.setTimer(RELEASEPLANTStime);
         strat_state = RELEASE_PLANTS;
         Serial.println("ckpt:PlantZ");
@@ -56,6 +62,7 @@ void Strategy::play()
     case RELEASE_PLANTS:
     {
       if(timer.endOfTimer()){
+        Log.notice("Strat : new state : HARDCODE_ROT1" CR);
         timer.setTimer(HARDCODEROT1time);
         strat_state = HARDCODE_ROT1;
       }else{
@@ -66,6 +73,7 @@ void Strategy::play()
     case HARDCODE_ROT1:
     {
       if(timer.endOfTimer()){
+        Log.notice("Strat : new state : HARDCODE_BACKWARD1" CR);
         timer.setTimer(HARDCODEBACKWARD1time);
         strat_state = HARDCODE_BACKWARD1;
       }else{
@@ -80,6 +88,7 @@ void Strategy::play()
     case HARDCODE_BACKWARD1:
     {
       if(timer.endOfTimer()){
+        Log.notice("Strat : new state : HARDCODE_ROT2" CR);
         timer.setTimer(HARDCODEROT2time);
         strat_state = HARDCODE_ROT2;
       }else{
@@ -90,6 +99,7 @@ void Strategy::play()
     case HARDCODE_ROT2:
     {
       if(timer.endOfTimer()){
+        Log.notice("Strat : new state : HARDCODE_BACKWARD2" CR);
         timer.setTimer(HARDCODEBACKWARD2time);
         strat_state = HARDCODE_BACKWARD2;
       }else{
@@ -104,6 +114,7 @@ void Strategy::play()
     case HARDCODE_BACKWARD2:
     {
       if(timer.endOfTimer()){
+        Log.notice("Strat : new state : END" CR);
         Serial.println("ckpt:FZ");
         strat_state = END;
       }else{
@@ -120,12 +131,14 @@ void Strategy::play()
   }
 }
 void Strategy::activateTimer(){
+  Log.trace("Strat : activate timer" CR);
   timer.activate();
   if(strat_state == FOLLOW_LINE){
     lineFollower->activateTimer();
   }
 }
 void Strategy::disableTimer(){
+  Log.trace("Strat : disable timer" CR);
   timer.disable();
   if(strat_state == FOLLOW_LINE){
     lineFollower->disableTimer();

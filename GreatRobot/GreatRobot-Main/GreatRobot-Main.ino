@@ -1,7 +1,13 @@
 //GreatRobot code
 #include "CommunicationArduinoLCD.h"
+#include "Motor.h"
+#include "SonarSensor.h"
+#include "LineFollower.h"
+#include "Movement.h"
 #include "Strategy.h"
 #include "DetectionManager.h"
+#include <ArduinoLog.h>
+
 // DEFINE PINS
 //const int encoR_PIN = 2;              // Encoder
 //const int encoL_PIN = 3;
@@ -57,6 +63,24 @@ enum { TEAM_CHOICE, WAIT, RUN, DETECTION, END} state;
 
 
 void setup() {
+  Log.begin(LOG_LEVEL_SILENT, &Serial,true);
+  /*
+  *** LOG level ***
+  * 0 - LOG_LEVEL_SILENT     no output 
+  * 1 - LOG_LEVEL_FATAL      fatal errors 
+  * 2 - LOG_LEVEL_ERROR      all errors  
+  * 3 - LOG_LEVEL_WARNING    errors, and warnings 
+  * 4 - LOG_LEVEL_NOTICE     errors, warnings and notices 
+  * 5 - LOG_LEVEL_TRACE      errors, warnings, notices & traces 
+  * 6 - LOG_LEVEL_VERBOSE    all 
+  */
+
+  //Start logging
+
+  Log.notice("******************************************" CR);                     
+  Log.notice("***        Logging: MAIN arduino        ***" CR);                      
+  Log.notice("******************************************" CR);
+
   motor.setupMotors();                        // Motor    
   Movement::setup();
   lineFollower.setup();                       // Line follower IR
@@ -66,6 +90,8 @@ void setup() {
   detectionManager.setup();
   timeLastDebug = millis();
   strategy.setup();
+
+  Log.trace("MAIN : finished setup");
 }
 
 
@@ -77,6 +103,7 @@ void loop() {
     {
       team = communicationArduinoLCD.chooseTeam();
       if (team != 0){
+        Log.notice("MAIN : new state : WAIT");
         state = WAIT;
         strategy.setTeam(team);
       }
@@ -86,6 +113,7 @@ void loop() {
     case WAIT :
     {
       if(digitalRead(start_switch_PIN)==HIGH){
+        Log.notice("MAIN : new state : RUN");
         state = RUN;
       }
       break;
@@ -96,6 +124,7 @@ void loop() {
     {
       timeNow = millis()-timeStartRUN;
         if (detectionManager.detection()) {
+          Log.notice("MAIN : new state : DETECTION");
           Movement::stopMovement();
           strategy.disableTimer();
           state = DETECTION;
@@ -103,20 +132,64 @@ void loop() {
         else{
           strategy.play();
         }
+        /*
+        if(millis()-timeLastDebug >= timeToUpdateDebug){
+            Serial.println("---RUN---");
+            Serial.print("Distance N: ");
+            Serial.println(sonarSensorN.getDistance());
+            Serial.print("Distance E: ");
+            Serial.println(sonarSensorE.getDistance());
+            Serial.print("Distance W: ");
+            Serial.println(sonarSensorW.getDistance());
+            Serial.print("Distance S: ");
+            Serial.println(sonarSensorS.getDistance());
+            Serial.print("Distance NE: ");
+            Serial.println(sonarSensorNE.getDistance());
+            Serial.print("Distance NW: ");
+            Serial.println(sonarSensorNW.getDistance());
+            Serial.print("Distance SE: ");
+            Serial.println(sonarSensorSE.getDistance());
+            Serial.print("Distance SW: ");
+            Serial.println(sonarSensorSW.getDistance());
+            timeLastDebug = millis();
+          }*/
       break;
     }
-
     case DETECTION:
     {
       if (!detectionManager.detection()){
+        Log.notice("MAIN : new state : RUN");
         state = RUN;
         strategy.activateTimer();
       }
+      /*
+      if(millis()-timeLastDebug >= timeToUpdateDebug){
+        Serial.println("--STOP--");
+          Serial.print("Distance N: ");
+          Serial.println(sonarSensorN.getDistance());
+          Serial.print("Distance E: ");
+          Serial.println(sonarSensorE.getDistance());
+          Serial.print("Distance W: ");
+          Serial.println(sonarSensorW.getDistance());
+          Serial.print("Distance S: ");
+          Serial.println(sonarSensorS.getDistance());
+          Serial.print("Distance NE: ");
+          Serial.println(sonarSensorNE.getDistance());
+          Serial.print("Distance NW: ");
+          Serial.println(sonarSensorNW.getDistance());
+          Serial.print("Distance SE: ");
+          Serial.println(sonarSensorSE.getDistance());
+          Serial.print("Distance SW: ");
+          Serial.println(sonarSensorSW.getDistance());
+          timeLastDebug = millis();
+          }
+          */
       break;
     }
 
     case END:
     {
+      Log.notice("MAIN : new state : TEAM_CHOICE");
       Movement::stopMovement();
       state = TEAM_CHOICE;
       break;
