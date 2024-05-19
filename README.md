@@ -25,9 +25,22 @@ The purpose of this project is create a robot that will be able to take the plan
 ## :rocket: Getting started
 
 ### :zap: Library
+All these libraries can be installed with the arduino IDE library manager.
 
-For the TFT LCD
-- MCUFRIEND_kbv
+For the TFT LCD:
+- MCUFRIEND_kbv by David Prentice
+- Adafruit TouchScreen by Adafruit
+
+For Motor driver:
+- Adafruit Motor Shield V2 by Adafruit
+
+For the Log:
+- ArduinoLog by Thijs Elenbaas
+
+For Unit test:
+- AUnit by Brian T.Park
+
+
 
 ### :seedling: class diagram
 
