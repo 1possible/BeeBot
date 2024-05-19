@@ -62,6 +62,6 @@ For Unit test:
 
 The unit test can be performed directly on an Arduino board. It is uploaded to the board just like classic arduino code. The result of the unit test will be sent by serial.
 
-unit test :[here](GreatRobot\unit-tests)
+unit test :[here](GreatRobot/unit-tests)
 
 troubleshooting: during compilation, it may not see the class file to be tested. This can be resolved by replacing the relative path with its absolute path (for the "include"). 
