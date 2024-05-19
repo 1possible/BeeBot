@@ -12,12 +12,12 @@ int CommunicationArduinoLCD::chooseTeam(){
     if(serialCommand.indexOf("Team") != -1){
       if(serialData.indexOf("1")!=-1){
         team = 1;
-        Log.notice("COMM : team received : %s" CR,team.c_str());
+        Log.notice("COMM : team received : %d" CR,team);
       }
       //BLUE TEAM
       else if (serialData.indexOf("2")!=-1){
         team = 2;
-        Log.notice("COMM : team received : %s" CR,team.c_str());
+        Log.notice("COMM : team received : %d" CR,team);
       }else{
         Log.warning("COMM : unexpected team" CR);
       }
