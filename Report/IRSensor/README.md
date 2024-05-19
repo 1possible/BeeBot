@@ -32,7 +32,7 @@ Les capteurs IR sont connectés aux broches numériques de la carte Arduino. Les
 Les images ci-dessous montrent les connexions des capteurs IR et des LEDs à l'Arduino :
 
 
-![Schéma de connexion (src:https://www.moussasoft.com/hw-201-capteur-dobstacle-ir-avec-arduino-uno/)](images/IRsensor.png)
+![Schéma de connexion (src:https://www.moussasoft.com/hw-201-capteur-dobstacle-ir-avec-arduino-uno/)](images/IRSensor.png)
 _Figure 1: Connexion du capteur IR à l'Arduino_
 
 ![Schéma de connexion (src:https://www.robot-maker.com/ouvrages/2-3-allumer-une-led/)](images/led.png)
